@@ -16,7 +16,6 @@ def get_home_md() -> str:
     return readme_md_contents.split("\n", 3)[-1]
 
 
-# pylint: disable=line-too-long
 def write():
     """Used to write the page in the app.py file"""
     with st.spinner("Loading Home ..."):
