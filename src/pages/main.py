@@ -32,8 +32,14 @@ def write():
             options=AVAILABLE_DATABASES
         )
 
-    print(selected_options)
-
     st.subheader("Date Picker")
-    start_date = st.date_input("start date")
-    end_date = st.date_input("end date")
+    col1, col2 = st.columns(2)
+    start_date = col1.date_input("start date")
+    end_date = col2.date_input("end date")
+
+    st.sidebar.subheader("Please enter the following APIKeys")
+    ieee_api_key = st.sidebar.text_input("IEEE APIKey", type="password")
+    scopus_api_ley = st.sidebar.text_input("Scopus APIKey", type="password")
+    st.sidebar.info("If you do not have an API key for scopus," +
+                    " it can be obtained from " +
+                    "[here](https://dev.elsevier.com/)")
