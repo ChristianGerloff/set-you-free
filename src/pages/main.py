@@ -102,3 +102,11 @@ def write():
     search_button = st.button("Search")
     if search_button:
         st.write("The search button is working.")
+
+    results_as_df = st.sidebar.checkbox("View the results as dataframe")
+    if results_as_df:
+        st.write("The results checkbox is working.")
+
+    download_button = st.button("Download")
+    if download_button:
+        st.write("Download button is working.")
