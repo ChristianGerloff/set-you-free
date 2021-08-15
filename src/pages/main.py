@@ -23,6 +23,18 @@ JOIN_TYPES = [
 ]
 
 
+def join_string_in_list(list_of_string: list) -> str:
+    """Joins the list of queries into one complete query.
+
+    Args:
+        list_of_string (list): List of queries.
+
+    Returns:
+        str: All queries combined.
+    """
+    return ' '.join(list_of_string)
+
+
 def write():
     """Writes content to the app."""
     st.title("Set You Free")
@@ -73,15 +85,19 @@ def write():
     if "query_string" not in st.session_state:
         st.session_state.query_string = []
 
-    if add_button:
+    if add_button and search_string == "":
+        st.error("The search query can not be empty.")
+
+    elif add_button and search_string != "":
         if join_type == "None":
             st.session_state.query_string.append("[" + search_string + "]")
         else:
             st.session_state.query_string.append(
                 "[" + search_string + "]" + " " + join_type)
 
-    st.write("**Query string** :astonished:")
-    st.write(str(st.session_state.query_string))
+    if search_string != "":
+        st.write("**Query string** :astonished:")
+        st.write(join_string_in_list(st.session_state.query_string))
 
     search_button = st.button("Search")
     if search_button:
