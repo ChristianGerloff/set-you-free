@@ -11,12 +11,13 @@ AVAILABLE_DATABASES = [
 ]
 
 JOIN_TYPES = [
+    "None",
+    "(",
+    ")",
     "AND",
     "OR",
     "(AND",
-    "AND)",
-    "(OR",
-    "OR)"
+    "(OR"
 ]
 
 
@@ -24,6 +25,13 @@ def write():
     """Writes content to the app."""
     st.title("Set You Free")
     st.sidebar.title("Settings")
+
+    st.sidebar.subheader("Please enter the following APIKeys")
+    ieee_api_key = st.sidebar.text_input("IEEE APIKey", type="password")
+    scopus_api_ley = st.sidebar.text_input("Scopus APIKey", type="password")
+    st.sidebar.info("If you do not have an API key for scopus," +
+                    " it can be obtained from " +
+                    "[here](https://dev.elsevier.com/)")
 
     st.subheader("Select the Database(s)")
     container = st.container()
@@ -54,17 +62,20 @@ def write():
     join_type = str_col2.selectbox(
         "Please select a type of join", JOIN_TYPES)
     add_button = st.button("Add")
+
     if "query_string" not in st.session_state:
         st.session_state.query_string = []
+
     if add_button:
-        st.session_state.query_string.append(
-            "[" + search_string + "]" + " " + join_type)
+        if join_type == "None":
+            st.session_state.query_string.append("[" + search_string + "]")
+        else:
+            st.session_state.query_string.append(
+                "[" + search_string + "]" + " " + join_type)
+
     st.write("**Query string** :astonished:")
     st.write(str(st.session_state.query_string))
 
-    st.sidebar.subheader("Please enter the following APIKeys")
-    ieee_api_key = st.sidebar.text_input("IEEE APIKey", type="password")
-    scopus_api_ley = st.sidebar.text_input("Scopus APIKey", type="password")
-    st.sidebar.info("If you do not have an API key for scopus," +
-                    " it can be obtained from " +
-                    "[here](https://dev.elsevier.com/)")
+    search_button = st.button("Search")
+    if search_button:
+        st.write("The search button is working.")
