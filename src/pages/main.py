@@ -107,6 +107,11 @@ def write():
     if results_as_df:
         st.write("The results checkbox is working.")
 
-    download_button = st.button("Download")
-    if download_button:
-        st.write("Download button is working.")
+    st.subheader("Download the results")
+    button_col_1, button_col_2 = st.columns(2)
+    csv_download_button = button_col_1.button("Download CSV")
+    bib_download_button = button_col_2.button("Download Bib")
+    if csv_download_button:
+        st.write("CSV download button is working.")
+    if bib_download_button:
+        st.write("Bib download button is working.")
