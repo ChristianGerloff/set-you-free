@@ -1,5 +1,7 @@
 import streamlit as st
 
+RESULTS_MIN_SLIDER = 1
+RESULTS_MAX_SLIDER = 100
 AVAILABLE_DATABASES = [
     "ACM",
     "arXiv",
@@ -32,6 +34,11 @@ def write():
     st.sidebar.info("If you do not have an API key for scopus," +
                     " it can be obtained from " +
                     "[here](https://dev.elsevier.com/)")
+
+    st.sidebar.subheader("Results required")
+    st.sidebar.slider("Please select the number of results required",
+                      min_value=RESULTS_MIN_SLIDER,
+                      max_value=RESULTS_MAX_SLIDER)
 
     st.subheader("Select the Database(s)")
     container = st.container()
