@@ -52,7 +52,6 @@ jobs:
       #----------------------------------------------
       #              run test suite
       #----------------------------------------------
-
       - name: Run pytest
         run: PYTHONPATH=src/ poetry run python -m coverage run -m pytest
 
@@ -61,3 +60,12 @@ jobs:
 
       - name: Generate html Report
         run: PYTHONPATH=src/ poetry run python -m coverage html
+      #----------------------------------------------
+      #              coverage badge
+      #----------------------------------------------
+      # - uses: codecov/codecov-action@v2
+      #  with:
+      #     token: ${{ secrets.CODECOV_TOKEN }}
+      #     fail_ci_if_error: true
+      #     verbose: true
+
