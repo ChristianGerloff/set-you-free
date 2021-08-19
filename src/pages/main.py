@@ -73,7 +73,6 @@ def write():
     start_date = col1.date_input("start date")
     end_date = col2.date_input("end date")
 
-    # https://blog.streamlit.io/session-state-for-streamlit/
     st.subheader("Search string :question:")
     str_col1, str_col2 = st.columns([3, 1])
     search_string = str_col1.text_input(
