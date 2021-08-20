@@ -23,3 +23,7 @@ Dockerfile
 
 # notes
 notes.md
+
+# coverage
+.coverage
+htmlcov/
