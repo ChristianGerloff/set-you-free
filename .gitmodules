@@ -1,3 +1,3 @@
-[submodule "feature/interface"]
-	path = feature/interface
+[submodule "findpapers"]
+	path = findpapers
 	url = git@github.com:ChristianGerloff/findpapers.git
