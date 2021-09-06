@@ -1,5 +1,7 @@
 import streamlit as st
 
+from src.search import Search
+
 RESULTS_MIN_SLIDER = 1
 RESULTS_MAX_SLIDER = 100
 AVAILABLE_DATABASES = [
@@ -100,7 +102,9 @@ def write():
 
     search_button = st.button("Search")
     if search_button:
-        st.write("The search button is working.")
+        # st.write("The search button is working.")
+        start_date = start_date.strptime("%Y-%m-%d")
+        end_date = end_date.strptime("%Y-%m-%d")
 
     results_as_df = st.sidebar.checkbox("View the results as dataframe")
     if results_as_df:

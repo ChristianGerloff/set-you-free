@@ -3,8 +3,11 @@ Class, which fetches scientific publications from multiple sources.
 """
 
 
-import findpapers as fp
+# import findpapers as fp
+
 from datetime import datetime
+import src.findpapers.findpapers as fp
+# from findpapers import findpapers as fp
 
 
 class Search:
@@ -29,7 +32,6 @@ class Search:
     def search(self,
                search_string: str,
                filename: str):
-        
         fp.search(filename,
                   search_string,
                   None,
