@@ -1,3 +1,0 @@
-[submodule "src/findpapers"]
-	path = src/findpapers
-	url = git@github.com:ChristianGerloff/findpapers.git

@@ -6,7 +6,7 @@ Class, which fetches scientific publications from multiple sources.
 # import findpapers as fp
 
 from datetime import datetime
-import src.findpapers.findpapers as fp
+import findpapers as fp
 # from findpapers import findpapers as fp
 
 
