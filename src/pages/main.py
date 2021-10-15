@@ -1,8 +1,8 @@
 import datetime
+import json
 import pandas as pd
 import streamlit as st
 import findpapers as fp
-
 
 RESULTS_MIN_SLIDER = 1
 RESULTS_MAX_SLIDER = 1000
@@ -28,7 +28,7 @@ JOIN_TYPES = [
 
 
 @st.cache
-def convert_results(search: pd.DataFrame):
+def convert_df_to_csv(search: pd.DataFrame):
     """Cachs the converted search results
 
     Args:
@@ -39,6 +39,21 @@ def convert_results(search: pd.DataFrame):
     """
     csv = search.to_csv(index=False).encode('utf-8')
     return csv
+
+
+@st.cache
+def convert_search_to_json(search: fp.models.search):
+    """Cachs the converted search results
+
+    Args:
+        search (findpapers.models.search): search results
+
+    Returns:
+        json (meme): encoded json
+    """
+    results = fp.models.search.Search.to_dict(search)
+    result = json.dumps(results, indent=2, sort_keys=True)
+    return result
 
 
 def join_string_in_list(list_of_string: list) -> str:
@@ -138,18 +153,22 @@ def write():
                            ieee_api_key)
         search_export = fp.RayyanExport(search)
         rayyan = pd.DataFrame(search_export.rayyan)
-        rayyan_csv = convert_results(rayyan)
+        rayyan_csv = convert_df_to_csv(rayyan)
+
+        result_json = convert_search_to_json(search)
         results_as_df = st.sidebar.checkbox("View the results as dataframe",
                                             True)
         if results_as_df:
             st.dataframe(rayyan)
 
         st.subheader("Download the results")
-        button_col_1, button_col_2 = st.columns(2)
-        button_col_1.download_button(label="Download CSV",
+        download_csv, download_json = st.columns(2)
+        download_csv.download_button(label='Download CSV',
                                      data=rayyan_csv,
-                                     file_name='set_you_free_results.csv',
+                                     file_name='set_you_free_rayyan.csv',
                                      mime='text/csv')
-        #bib_download_button = button_col_2.button("Download Bib")
-        #if bib_download_button:
-            #st.write("Bib download button is working.")
+        download_json.download_button(label='Download JSON',
+                                      data=result_json,
+                                      file_name='set_you_free_results.json',
+                                      mime='text/plain')
+
