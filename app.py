@@ -14,6 +14,11 @@ def write_page(page):
     """
     page.write()
 
+hide_footer_style = """
+    <style>
+    .reportview-container .main footer {visibility: hidden;}    
+    """
+st.markdown(hide_footer_style, unsafe_allow_html=True)
 
 PAGES = {
     "About": src.pages.home,
@@ -29,3 +34,4 @@ page = PAGES[selection]
 with st.spinner(f"Loading {selection} ..."):
     write_page(page)
 st.sidebar.title("About")
+
