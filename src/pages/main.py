@@ -37,7 +37,7 @@ def convert_results(search: pd.DataFrame):
     Returns:
         csv (meme): encoded csv of rayyan compatible results
     """
-    csv = search.to_csv().encode('utf-8')
+    csv = search.to_csv(index=False).encode('utf-8')
     return csv
 
 
