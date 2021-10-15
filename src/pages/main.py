@@ -1,10 +1,11 @@
-from pathlib import Path
-
+import datetime
+import pandas as pd
 import streamlit as st
-from src.search import Search
+import findpapers as fp
+
 
 RESULTS_MIN_SLIDER = 1
-RESULTS_MAX_SLIDER = 100
+RESULTS_MAX_SLIDER = 1000
 AVAILABLE_DATABASES = [
     "ACM",
     "arXiv",
@@ -26,6 +27,20 @@ JOIN_TYPES = [
 ]
 
 
+@st.cache
+def convert_results(search: pd.DataFrame):
+    """Cachs the converted search results
+
+    Args:
+        search (pd.DataFrame): rayyan search results
+
+    Returns:
+        csv (meme): encoded csv of rayyan compatible results
+    """
+    csv = search.to_csv().encode('utf-8')
+    return csv
+
+
 def join_string_in_list(list_of_string: list) -> str:
     """Joins the list of queries into one complete query.
 
@@ -41,8 +56,6 @@ def join_string_in_list(list_of_string: list) -> str:
 def write():
     """Writes content to the app."""
 
-    _DOWNLOADS_PATH = str(Path.home() / "Downloads" / "search.json")
-
     st.title("Set You Free")
     st.sidebar.title("Settings")
 
@@ -54,9 +67,9 @@ def write():
                     "[here](https://dev.elsevier.com/)")
 
     st.sidebar.subheader("Results required")
-    st.sidebar.slider("Please select the number of results required",
-                      min_value=RESULTS_MIN_SLIDER,
-                      max_value=RESULTS_MAX_SLIDER)
+    limit = st.sidebar.slider("Please select the number of results required",
+                              min_value=RESULTS_MIN_SLIDER,
+                              max_value=RESULTS_MAX_SLIDER)
 
     st.subheader("Select the Database(s)")
     container = st.container()
@@ -76,7 +89,8 @@ def write():
 
     st.subheader("Date Picker :calendar:")
     col1, col2 = st.columns(2)
-    start_date = col1.date_input("start date")
+    start_date = col1.date_input("start date",
+                                 datetime.date(2021, 10, 1))
     end_date = col2.date_input("end date")
 
     st.subheader("Search string :question:")
@@ -107,20 +121,27 @@ def write():
 
     search_button = st.button("Search")
     if search_button:
-        start_date = start_date.strftime("%Y/%m/%d")
-        end_date = end_date.strftime("%Y/%m/%d")
-        basic_search = Search(start_date, end_date)
-        basic_search.search(search_string, _DOWNLOADS_PATH)
+        search = fp.search(None,
+                           search_string,
+                           start_date,
+                           end_date,
+                           limit*len(selected_options),
+                           limit,
+                           selected_options)
+        search_export = fp.RayyanExport(search)
+        rayyan = pd.DataFrame(search_export.rayyan)
+        rayyan_csv = convert_results(rayyan)
+        results_as_df = st.sidebar.checkbox("View the results as dataframe",
+                                            True)
+        if results_as_df:
+            st.dataframe(rayyan)
 
-    results_as_df = st.sidebar.checkbox("View the results as dataframe")
-    if results_as_df:
-        st.write("The results checkbox is working.")
-
-    st.subheader("Download the results")
-    button_col_1, button_col_2 = st.columns(2)
-    csv_download_button = button_col_1.button("Download CSV")
-    bib_download_button = button_col_2.button("Download Bib")
-    if csv_download_button:
-        st.write("CSV download button is working.")
-    if bib_download_button:
-        st.write("Bib download button is working.")
+        st.subheader("Download the results")
+        button_col_1, button_col_2 = st.columns(2)
+        button_col_1.download_button(label="Download CSV",
+                                     data=rayyan_csv,
+                                     file_name='set_you_free_results.csv',
+                                     mime='text/csv')
+        #bib_download_button = button_col_2.button("Download Bib")
+        #if bib_download_button:
+            #st.write("Bib download button is working.")
