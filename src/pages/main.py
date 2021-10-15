@@ -62,6 +62,11 @@ def write():
     st.sidebar.subheader("Please enter the following APIKeys")
     ieee_api_key = st.sidebar.text_input("IEEE APIKey", type="password")
     scopus_api_ley = st.sidebar.text_input("Scopus APIKey", type="password")
+
+    # replace empty keys
+    ieee_api_key = None if ieee_api_key == '' else ieee_api_key
+    scopus_api_ley = None if scopus_api_ley == '' else scopus_api_ley
+    
     st.sidebar.info("If you do not have an API key for scopus," +
                     " it can be obtained from " +
                     "[here](https://dev.elsevier.com/)")
@@ -127,7 +132,10 @@ def write():
                            end_date,
                            limit*len(selected_options),
                            limit,
-                           selected_options)
+                           selected_options,
+                           None,
+                           scopus_api_ley,
+                           ieee_api_key)
         search_export = fp.RayyanExport(search)
         rayyan = pd.DataFrame(search_export.rayyan)
         rayyan_csv = convert_results(rayyan)
