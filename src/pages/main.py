@@ -1,5 +1,6 @@
-import streamlit as st
+from pathlib import Path
 
+import streamlit as st
 from src.search import Search
 
 RESULTS_MIN_SLIDER = 1
@@ -39,6 +40,9 @@ def join_string_in_list(list_of_string: list) -> str:
 
 def write():
     """Writes content to the app."""
+
+    _DOWNLOADS_PATH = str(Path.home() / "Downloads" / "search.json")
+
     st.title("Set You Free")
     st.sidebar.title("Settings")
 
@@ -98,13 +102,15 @@ def write():
 
     if search_string != "":
         st.write("**Query string** :astonished:")
-        st.write(join_string_in_list(st.session_state.query_string))
+        search_string = join_string_in_list(st.session_state.query_string)
+        st.write(search_string)
 
     search_button = st.button("Search")
     if search_button:
-        # st.write("The search button is working.")
-        start_date = start_date.strptime("%Y-%m-%d")
-        end_date = end_date.strptime("%Y-%m-%d")
+        start_date = start_date.strftime("%Y/%m/%d")
+        end_date = end_date.strftime("%Y/%m/%d")
+        basic_search = Search(start_date, end_date)
+        basic_search.search(search_string, _DOWNLOADS_PATH)
 
     results_as_df = st.sidebar.checkbox("View the results as dataframe")
     if results_as_df:
