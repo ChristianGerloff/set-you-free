@@ -3,6 +3,10 @@ import json
 import pandas as pd
 import streamlit as st
 import findpapers as fp
+import matplotlib.pyplot as plt
+import graphviz as graphviz
+
+from matplotlib_venn import venn2, venn3
 
 RESULTS_MIN_SLIDER = 1
 RESULTS_MAX_SLIDER = 1000
@@ -25,20 +29,6 @@ JOIN_TYPES = [
     "(AND",
     "(OR"
 ]
-
-
-@st.cache
-def convert_df_to_csv(search: pd.DataFrame):
-    """Cachs the converted search results
-
-    Args:
-        search (pd.DataFrame): rayyan search results
-
-    Returns:
-        csv (meme): encoded csv of rayyan compatible results
-    """
-    csv = search.to_csv(index=False).encode('utf-8')
-    return csv
 
 
 @st.cache
@@ -86,8 +76,8 @@ def write():
                     " it can be obtained from " +
                     "[here](https://dev.elsevier.com/)")
 
-    st.sidebar.subheader("Results required")
-    limit = st.sidebar.slider("Please select the number of results required",
+    st.sidebar.subheader("Result Limit")
+    limit = st.sidebar.slider("Please select the maximum number of papers per database.",
                               min_value=RESULTS_MIN_SLIDER,
                               max_value=RESULTS_MAX_SLIDER)
 
@@ -96,13 +86,13 @@ def write():
     all_db_selected = st.checkbox("Select all", value=True)
 
     if all_db_selected:
-        selected_options = container.multiselect(
+        databases = container.multiselect(
             "Select one or more Databases:",
             options=AVAILABLE_DATABASES,
             default=AVAILABLE_DATABASES
         )
     else:
-        selected_options = container.multiselect(
+        databases = container.multiselect(
             "Select one or more Databases:",
             options=AVAILABLE_DATABASES
         )
@@ -118,7 +108,7 @@ def write():
     search_string = str_col1.text_input(
         "Please enter the search string", "")
     join_type = str_col2.selectbox(
-        "Please select a type of join", JOIN_TYPES)
+        "Please select how to join your search strings", JOIN_TYPES)
     add_button = st.button("Add")
 
     if "query_string" not in st.session_state:
@@ -145,15 +135,14 @@ def write():
                            search_string,
                            start_date,
                            end_date,
-                           limit*len(selected_options),
+                           limit*len(databases),
                            limit,
-                           selected_options,
+                           databases,
                            None,
                            scopus_api_key,
                            ieee_api_key)
         search_export = fp.RayyanExport(search)
-        rayyan = pd.DataFrame(search_export.rayyan)
-        rayyan_csv = convert_df_to_csv(rayyan)
+        rayyan_csv, rayyan = search_export.generate_rayyan_csv()
 
         result_json = convert_search_to_json(search)
         results_as_df = st.sidebar.checkbox("View the results as dataframe",
@@ -161,14 +150,43 @@ def write():
         if results_as_df:
             st.dataframe(rayyan)
 
-        st.subheader("Download the results")
+        st.subheader('PRISMA Information')
+        all_papers = rayyan.explode('databases')
+        stats_databses = all_papers.groupby(['databases'])['key'].apply(list)
+        n_duplicates = len(all_papers)-len(rayyan)
+
+        prisma = graphviz.Digraph('PRISMA')
+        prisma.attr('node', shape='box')
+        prisma.node('Identification')
+        prisma.node('Screening')
+        prisma.edge('Identification', 'Screening', label=str(n_duplicates))
+
+
+        if len(databases) == 2:
+            col_prisma_1, col_prisma_2 = st.columns(2)
+            venn2([set(stats_databses[databases[0]]),
+                   set(stats_databses[databases[1]])],
+                  set_labels=databases)
+            col_prisma_1.graphviz_chart(prisma)
+            col_prisma_2.pyplot(plt)
+        elif len(databases) == 3:
+            col_prisma_1, col_prisma_2 = st.columns(2)
+            venn3([set(stats_databses[databases[0]]),
+                   set(stats_databses[databases[1]]),
+                   set(stats_databses[databases[1]])],
+                  set_labels=databases)
+            col_prisma_1.graphviz_chart(prisma)
+            col_prisma_2.pyplot(plt)
+        else:
+            st.graphviz_chart(prisma)
+
+        st.subheader("Download")
         download_csv, download_json = st.columns(2)
-        download_csv.download_button(label='Download CSV',
+        download_csv.download_button(label='Rayyan - CSV',
                                      data=rayyan_csv,
                                      file_name='set_you_free_rayyan.csv',
                                      mime='text/csv')
-        download_json.download_button(label='Download JSON',
+        download_json.download_button(label='Details - JSON',
                                       data=result_json,
                                       file_name='set_you_free_results.json',
                                       mime='text/plain')
-
