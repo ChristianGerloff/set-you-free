@@ -125,12 +125,25 @@ def write():
                 "[" + search_string + "]")
             st.session_state.query_string.append(join_type)
 
+    search_string_op = st.empty()
     if search_string != "":
         st.write("**Query string** :astonished:")
         search_string = join_string_in_list(st.session_state.query_string)
-        st.write(search_string)
+        search_string_op.write(search_string)
 
-    search_button = st.button("Search")
+    search_col, clear_col, remove_last_string_col = st.columns(3)
+    search_button = search_col.button("Search")
+    clear_button = clear_col.button("Clear the entire query")
+    remove_last_string_button = remove_last_string_col.button("Remove the last query")
+
+    if clear_button:
+        st.session_state.query_string.clear()
+        search_string_op.write("")
+        st.warning("Your query has been cleared")
+
+    if remove_last_string_button:
+        st.write('remove last')
+
     if search_button:
         search = fp.search(None,
                            search_string,
