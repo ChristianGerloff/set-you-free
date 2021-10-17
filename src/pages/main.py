@@ -1,11 +1,11 @@
 import datetime
 import json
+
+import findpapers as fp
+import graphviz as graphviz
+import matplotlib.pyplot as plt
 import pandas as pd
 import streamlit as st
-import findpapers as fp
-import matplotlib.pyplot as plt
-import graphviz as graphviz
-
 from matplotlib_venn import venn2, venn3
 
 RESULTS_MIN_SLIDER = 1
@@ -122,7 +122,8 @@ def write():
             st.session_state.query_string.append("[" + search_string + "]")
         else:
             st.session_state.query_string.append(
-                "[" + search_string + "]" + " " + join_type)
+                "[" + search_string + "]")
+            st.session_state.query_string.append(join_type)
 
     if search_string != "":
         st.write("**Query string** :astonished:")
@@ -160,7 +161,6 @@ def write():
         prisma.node('Identification')
         prisma.node('Screening')
         prisma.edge('Identification', 'Screening', label=str(n_duplicates))
-
 
         if len(databases) == 2:
             col_prisma_1, col_prisma_2 = st.columns(2)
