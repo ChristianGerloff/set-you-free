@@ -142,9 +142,19 @@ def write():
         st.warning("Your query has been cleared")
 
     if remove_last_string_button:
-        st.write('remove last')
+        if len(st.session_state.query_string) > 1 and st.session_state.query_string[-2] in JOIN_TYPES:
+            del st.session_state.query_string[-2:]
+            search_string_op.write(join_string_in_list(
+                st.session_state.query_string
+            ))
+        elif len(st.session_state.query_string) == 1:
+            st.warning("Please press the **Clear the " + \
+                "entire query** button to delete the entire query")
 
-    if search_button:
+    if search_button and search_string == "":
+        st.error("The query can not be empty")
+    elif search_button and search_string != "":
+        st.write("Please wait till the results are obtained")
         search = fp.search(None,
                            search_string,
                            start_date,
