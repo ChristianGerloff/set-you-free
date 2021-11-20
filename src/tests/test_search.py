@@ -21,4 +21,3 @@ def test_default_search(start_date: datetime,
     basic_search = Search(start_date, end_date)
     basic_search.search(search_string, filename)
     pass
-

@@ -19,7 +19,6 @@ AVAILABLE_DATABASES = [
     "PubMed",
     "Scopus"
 ]
-
 JOIN_TYPES = [
     "None",
     "(",
@@ -28,6 +27,10 @@ JOIN_TYPES = [
     "OR",
     "(AND",
     "(OR"
+]
+SEARCH_STRING_TYPE = [
+    "Insert search string directly",
+    "Build search string"
 ]
 
 
@@ -104,37 +107,57 @@ def write():
     end_date = col2.date_input("end date")
 
     st.subheader("Search string :question:")
-    str_col1, str_col2 = st.columns([3, 1])
-    search_string = str_col1.text_input(
-        "Please enter the search string", "")
-    join_type = str_col2.selectbox(
-        "Please select how to join your search strings", JOIN_TYPES)
-    add_button = st.button("Add")
+    search_string_type = st.selectbox(
+        "How would you like to enter the search string?",
+        SEARCH_STRING_TYPE
+    )
+    if search_string_type == "Build search string":
+        str_col1, str_col2 = st.columns([3, 1])
+        search_string = str_col1.text_input(
+            "Please enter the search string", "")
+        join_type = str_col2.selectbox(
+            "Please select how to join your search strings", JOIN_TYPES)
+        add_button = st.button("Add")
 
-    if "query_string" not in st.session_state:
-        st.session_state.query_string = []
+        if "query_string" not in st.session_state:
+            st.session_state.query_string = []
 
-    if add_button and search_string == "":
-        st.error("The search query can not be empty.")
+        if add_button and search_string == "":
+            st.error("The search query can not be empty.")
 
-    elif add_button and search_string != "":
-        if join_type == "None":
-            st.session_state.query_string.append("[" + search_string + "]")
-        else:
-            st.session_state.query_string.append(
-                "[" + search_string + "]")
-            st.session_state.query_string.append(join_type)
+        elif add_button and search_string != "":
+            if join_type == "None":
+                st.session_state.query_string.append("[" + search_string + "]")
+            else:
+                st.session_state.query_string.append(
+                    "[" + search_string + "]")
+                st.session_state.query_string.append(join_type)
 
-    search_string_op = st.empty()
-    if search_string != "":
-        st.write("**Query string** :astonished:")
-        search_string = join_string_in_list(st.session_state.query_string)
-        search_string_op.write(search_string)
+        search_string_op = st.empty()
+        if search_string != "":
+            st.write("**Query string** :astonished:")
+            search_string = join_string_in_list(st.session_state.query_string)
+            search_string_op.write(search_string)
+
+    else:
+        if "query_string" not in st.session_state:
+            st.session_state.query_string = []
+
+        search_string = st.text_input(
+            "Please enter the search string", "")
+        if search_string == "":
+            st.error("Please enter a search string")
+
+        search_string_op = st.empty()
+        if search_string != "":
+            st.write("**Query string** :astonished:")
+            search_string_op.write(search_string)
 
     search_col, clear_col, remove_last_string_col = st.columns(3)
     search_button = search_col.button("Search")
     clear_button = clear_col.button("Clear the entire query")
-    remove_last_string_button = remove_last_string_col.button("Remove the last query")
+    remove_last_string_button = remove_last_string_col.button(
+        "Remove the last query")
 
     if clear_button:
         st.session_state.query_string.clear()
@@ -148,8 +171,8 @@ def write():
                 st.session_state.query_string
             ))
         elif len(st.session_state.query_string) == 1:
-            st.warning("Please press the **Clear the " + \
-                "entire query** button to delete the entire query")
+            st.warning("Please press the **Clear the " +
+                       "entire query** button to delete the entire query")
 
     if search_button and search_string == "":
         st.error("The query can not be empty")
