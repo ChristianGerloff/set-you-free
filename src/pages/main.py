@@ -1,6 +1,6 @@
 import datetime
 import json
-
+import numpy as np
 import findpapers as fp
 import graphviz as graphviz
 import matplotlib.pyplot as plt
@@ -205,7 +205,7 @@ def write():
         prisma = graphviz.Digraph('PRISMA')
         prisma.attr('node', shape='box')
         prisma.node('Identification')
-        prisma.node('Screening')
+        prisma.node('Screening', f' {len(rayyan)} records after duplicate removal')
         prisma.edge('Identification', 'Screening', label=str(n_duplicates))
 
         if len(databases) == 2:
@@ -219,12 +219,23 @@ def write():
             col_prisma_1, col_prisma_2 = st.columns(2)
             venn3([set(stats_databses[databases[0]]),
                    set(stats_databses[databases[1]]),
-                   set(stats_databses[databases[1]])],
+                   set(stats_databses[databases[2]])],
                   set_labels=databases)
             col_prisma_1.graphviz_chart(prisma)
             col_prisma_2.pyplot(plt)
         else:
-            st.graphviz_chart(prisma)
+            matches = []
+            col_prisma_1, col_prisma_2 = st.columns(2)
+            col_prisma_1.graphviz_chart(prisma)
+
+            unique_databases = [list(x) for x in set(tuple(x) for x in rayyan['databases'])]
+            for n in unique_databases:
+                matches.append(sum([n == i for i in rayyan['databases']]))
+
+            y_pos = np.arange(len(unique_databases))
+            plt.bar(y_pos, matches)
+            plt.xticks(y_pos, unique_databases)
+            col_prisma_2.pyplot(plt)
 
         st.subheader("Download")
         download_csv, download_json = st.columns(2)
