@@ -168,8 +168,7 @@ def write():
         if len(st.session_state.query_string) > 1 and st.session_state.query_string[-2] in JOIN_TYPES:
             del st.session_state.query_string[-2:]
             search_string_op.write(join_string_in_list(
-                st.session_state.query_string
-            ))
+                st.session_state.query_string))
         elif len(st.session_state.query_string) == 1:
             st.warning("Please press the **Clear the " +
                        "entire query** button to delete the entire query")
@@ -190,6 +189,9 @@ def write():
                            ieee_api_key)
         search_export = fp.RayyanExport(search)
         rayyan_csv, rayyan = search_export.generate_rayyan_csv()
+
+        ris = fp.RisExport(search)
+        ris_file, ris_list = ris.generate_ris('mhh.ris')
 
         result_json = convert_search_to_json(search)
         results_as_df = st.sidebar.checkbox("View the results as dataframe",
@@ -238,12 +240,16 @@ def write():
             col_prisma_2.pyplot(plt)
 
         st.subheader("Download")
-        download_csv, download_json = st.columns(2)
-        download_csv.download_button(label='Rayyan - CSV',
-                                     data=rayyan_csv,
-                                     file_name='set_you_free_rayyan.csv',
-                                     mime='text/csv')
+        download_json, download_ris, download_csv, = st.columns(3)
         download_json.download_button(label='Details - JSON',
                                       data=result_json,
                                       file_name='set_you_free_results.json',
                                       mime='text/plain')
+        download_ris.download_button(label='CADIMA - RIS',
+                                     data=ris_file,
+                                     file_name='set_you_free_cadima.ris',
+                                     mime='text/plain')                              
+        download_csv.download_button(label='Rayyan - CSV',
+                                     data=rayyan_csv,
+                                     file_name='set_you_free_rayyan.csv',
+                                     mime='text/csv')
