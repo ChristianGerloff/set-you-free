@@ -10,7 +10,7 @@ during structured literature search and review.
 
 # Demo
 
-![example image](https://github.com/ChristianGerloff/set-you-free/tree/feature/findpapers-integration/assets/demo.gif)
+![example image](https://github.com/ChristianGerloff/set-you-free/blob/feature/findpapers-integration/assets/demo.gif)
 
 
 # Requirements
