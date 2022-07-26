@@ -30,3 +30,14 @@ SEARCH_STRING_TYPE = [
 ]
 AVAILABLE_PUBTYPES = ['journal', 'preprint', 'conference', 'book']
 DEFAULT_PUBTYPES = ['journal', 'preprint']
+HELP_ENRICH = (
+    "Enrich aims to combine information across different databases to complete "
+    "missing information of a publication."
+)
+HELP_CROSS_REF = (
+    "The cross-reference option uses the reference list and the citations "
+    "of the found publications to extend the search results."
+)
+HELP_SEARCH_STRING = (
+    "[term a] OR ([term b] AND ([term c] OR [term d]"
+)

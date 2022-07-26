@@ -54,8 +54,9 @@ def build_search_str():
         str: Search string.
     """
     search_str_col, operator_col = st.columns([3, 1])
-    search_string = search_str_col.text_input("Please enter the search string", "")
-    operator = operator_col.selectbox("Please select how to join your search strings", cs.JOIN_TYPES)
+    search_string = search_str_col.text_input("Please enter the search string (e.g., fNIRS)", "")
+    operator = operator_col.selectbox("Please select how to join your search strings",
+                                      cs.JOIN_TYPES)
     add_button = st.button("Add")
 
     if "query_string" not in st.session_state:
@@ -72,7 +73,6 @@ def build_search_str():
 
     search_str_txt = st.empty()
     if search_string != "":
-        st.write("**Query** :astonished:")
         search_string = join_string_in_list(st.session_state.query_string)
         search_str_txt.write(search_string)
     return search_str_txt
@@ -88,15 +88,16 @@ def single_search_str():
         st.session_state.query_string = []
 
     search_string = st.text_input(
-        "Please enter the search string", "")
+        "Please enter the search string (e.g., [ASD] AND [fMRI])",
+        "",
+        help=cs.HELP_SEARCH_STRING)
     add_button = st.button("Add")
 
     if add_button and search_string == "":
-        st.error("Please enter a search string")
+        st.error("Please enter a search string (e.g., [ASD] AND [fMRI])")
 
     search_str_txt = st.empty()
     if search_string != "":
-        st.write("**Query** :astonished:")
         search_str_txt.write(search_string)
         st.session_state.query_string = search_string
 

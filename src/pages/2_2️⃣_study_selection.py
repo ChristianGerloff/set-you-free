@@ -7,6 +7,8 @@ from utils.site_config import set_page_title
 # configure page
 set_page_title("Study selection")
 
+st.subheader("Manual selection of publications")
+
 if 'review' not in st.session_state:
     st.error("Please run the search first.")
 else:
@@ -18,6 +20,17 @@ else:
                                        options=['default'],
                                        default='default')
     criterias = 'default' if criterias == '' else criterias
+
+    st.sidebar.info(
+        f"Reviewed papers: {len(st.session_state.review[st.session_state.review.reviewed == True])} of "
+        f"{len(st.session_state.review)}"
+    )
+
+    # select study
+    st.info(
+        "You can use the checkbox in the table (see doi) to select a publication. "
+        "The decision column describes which publications are included in your results."
+    )
 
     gb = GridOptionsBuilder.from_dataframe(st.session_state.review)
     gb.configure_column(field='custom1', editable=True)
