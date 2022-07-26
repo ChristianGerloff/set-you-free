@@ -11,6 +11,7 @@ from matplotlib_venn import venn2, venn3
 from utils.site_config import set_page_title
 from utils.search_engine import build_search_str, single_search_str, get_search_str
 from utils.search_engine import set_build_btns, set_single_btns
+from utils.search_engine import convert_search_to_json
 
 # configure page
 set_page_title("Literature Search")
@@ -119,6 +120,27 @@ elif search_state and search_string != "":
                        enrich=enrich,
                        similarity_threshold=similarity_threshold)
 
+    # process search results
+    result_json = convert_search_to_json(search)
+    search_export = fp.RayyanExport(search)
+    rayyan_file, rayyan_df = search_export.generate_rayyan_csv()
     ris = fp.RisExport(search)
     ris_file, ris_df = ris.generate_ris()
     st.dataframe(ris_df)
+
+    # download results
+    st.subheader("Download")
+    download_json, download_ris, download_csv, = st.columns(3)
+    download_json.download_button(label='Details - JSON',
+                                  data=result_json,
+                                  file_name='set_you_free_results.json',
+                                  mime='text/plain')
+    download_ris.download_button(label='CADIMA - RIS',
+                                 data=ris_file,
+                                 file_name='set_you_free_cadima.ris',
+                                 mime='text/plain')                              
+    download_csv.download_button(label='Rayyan - CSV',
+                                 data=rayyan_file,
+                                 file_name='set_you_free_rayyan.csv',
+                                 mime='text/csv')
+
