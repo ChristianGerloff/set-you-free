@@ -15,24 +15,54 @@ from utils.search_engine import set_build_btns, set_single_btns
 # configure page
 set_page_title("Literature Search")
 
+
 # sidebar
-st.sidebar.title("Settings")
-st.sidebar.subheader("Please enter the following APIKeys")
+st.sidebar.title("Search settings")
+
+# general settings
+st.sidebar.write("We recommend using time-consuming enrich and cross-references features only in console mode.")
+enrich_col, cross_search_col = st.sidebar.columns(2)
+enrich = enrich_col.checkbox("Enrich papers", value=False)
+cross_search = cross_search_col.checkbox("Cross-references", value=False)
+
+if enrich is True or cross_search is True:
+    st.sidebar.info("We recommend using time-consuming enrich and" 
+                    "cross-references features only in console mode.")
+
+# publication types
+pub_types = st.sidebar.multiselect("Select one or more publication types:",
+                                   options=cs.AVAILABLE_PUBTYPES,
+                                   default=cs.DEFAULT_PUBTYPES)
+
+# API keys
+st.sidebar.subheader("Please enter the following API Keys")
 ieee_api_key = st.sidebar.text_input("IEEE APIKey", type="password")
 scopus_api_key = st.sidebar.text_input("Scopus APIKey", type="password")
+
+if scopus_api_key is None:
+    st.sidebar.info("If you do not have an API key for scopus,"
+                    " it can be obtained from "
+                    "[here](https://dev.elsevier.com/)")
 
 # replace empty keys
 ieee_api_key = None if ieee_api_key == '' else ieee_api_key
 scopus_api_key = None if scopus_api_key == '' else scopus_api_key
-st.sidebar.info("If you do not have an API key for scopus," +
-                " it can be obtained from " +
-                "[here](https://dev.elsevier.com/)")
+
 
 # result limits
-st.sidebar.subheader("Result Limit")
+st.sidebar.subheader("Maximum number of papers")
 limit = st.sidebar.slider("Please select the maximum number of papers per database.",
                           min_value=cs.RESULTS_MIN_SLIDER,
-                          max_value=cs.RESULTS_MAX_SLIDER)
+                          max_value=cs.RESULTS_MAX_SLIDER,
+                          value=cs.RESULTS_DEFAULT_SLIDER)
+
+# Duplication threshold here inverse definition
+st.sidebar.subheader("Duplication sensitivity")
+senitivity = st.sidebar.slider("Please select the maximum number of papers per database.",
+                               min_value=cs.DUPLICATION_MIN_SLIDER,
+                               max_value=cs.DUPLICATION_MAX_SLIDER,
+                               step=cs.DUPLICATION_STEP_SLIDER)
+similarity_threshold = 1 - (senitivity - cs.DUPLICATION_MIN_SLIDER)
 
 # database selection
 st.subheader("Select the Database(s)")
@@ -74,23 +104,21 @@ search_string = get_search_str()
 if search_state and search_string == "":
     st.error("Please enter a search string")
 elif search_state and search_string != "":
+    st.write("Please wait till the results are obtained")
     search = fp.search(None,
-                search_string,
-                start_date,
-                end_date,
-                limit=limit * len(databases),
-                limit_per_database=limit,
-                databases=databases,
-                publication_types=None,
-                scopus_api_token=scopus_api_key,
-                ieee_api_token=ieee_api_key,
-                cross_reference_search=False,
-                enrich=False,
-                similarity_threshold=0.95)
-    ris = fp.RisExport(search)
-    ris_file, ris_df = ris.generate_ris('tmp.ris')
-    results_as_df = st.sidebar.checkbox("View the results as dataframe",
-        True)
+                       search_string,
+                       start_date,
+                       end_date,
+                       limit=limit * len(databases),
+                       limit_per_database=limit,
+                       databases=databases,
+                       publication_types=pub_types,
+                       scopus_api_token=scopus_api_key,
+                       ieee_api_token=ieee_api_key,
+                       cross_reference_search=cross_search,
+                       enrich=enrich,
+                       similarity_threshold=similarity_threshold)
 
-    if results_as_df:
-        st.dataframe(ris_df)
+    ris = fp.RisExport(search)
+    ris_file, ris_df = ris.generate_ris()
+    st.dataframe(ris_df)
