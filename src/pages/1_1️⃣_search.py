@@ -22,18 +22,19 @@ enrich = enrich_col.checkbox("Enrich papers", value=False)
 cross_search = cross_search_col.checkbox("Cross-references", value=False)
 
 if enrich is True or cross_search is True:
-    st.sidebar.info("We recommend using time-consuming enrich and" 
+    st.sidebar.info("We recommend using time-consuming enrich and"
                     "cross-references features only in console mode.")
 
 # publication types
 pub_types = st.sidebar.multiselect("Select one or more publication types:",
                                    options=cs.AVAILABLE_PUBTYPES,
                                    default=cs.DEFAULT_PUBTYPES)
+pub_types = None if pub_types == '' else pub_types
 
 # API keys
-st.sidebar.subheader("Please enter the following API Keys")
-ieee_api_key = st.sidebar.text_input("IEEE APIKey", type="password")
-scopus_api_key = st.sidebar.text_input("Scopus APIKey", type="password")
+st.sidebar.subheader("Please enter the following API keys")
+ieee_api_key = st.sidebar.text_input("IEEE API key", type="password")
+scopus_api_key = st.sidebar.text_input("Scopus API key", type="password")
 
 if scopus_api_key is None:
     st.sidebar.info("If you do not have an API key for scopus,"
@@ -125,8 +126,25 @@ elif search_state and search_string != "":
     ris_file, ris_df = ris.generate_ris()
 
     # store session data
-    st.session_state.search = search
-    st.session_state.rayyan_df = rayyan_df
+    if 'review' not in st.session_state:
+        st.session_state.search = search.copy()
+        st.session_state.ris_df = ris_df.copy()
+        st.session_state.rayyan_df = rayyan_df.copy()
+        st.session_state.review = ris_df.copy()
+        st.session_state.review.insert(1, 'criteria', 'default')
+        st.session_state.review.insert(1, 'decision', False)
+        st.session_state.review.insert(1, 'reviewed', False)
+
+    else:
+        st.info("Override results!!!")
+        if st.button("Yes I'm ready to override"):
+            st.session_state.search = search.copy()
+            st.session_state.ris_df = ris_df.copy()
+            st.session_state.rayyan_df = rayyan_df.copy()
+            st.session_state.review = ris_df.copy()
+            st.session_state.review.insert(1, 'criteria', 'default')
+            st.session_state.review.insert(1, 'decision', False)
+            st.session_state.review.insert(1, 'reviewed', False)
 
     # display results
     st.dataframe(ris_df)
@@ -141,7 +159,7 @@ elif search_state and search_string != "":
     download_ris.download_button(label='CADIMA - RIS',
                                  data=ris_file,
                                  file_name='set_you_free_cadima.ris',
-                                 mime='text/plain')                        
+                                 mime='text/plain')                   
     download_csv.download_button(label='Rayyan - CSV',
                                  data=rayyan_file,
                                  file_name='set_you_free_rayyan.csv',

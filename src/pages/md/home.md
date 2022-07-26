@@ -7,5 +7,6 @@ during structured literature search and review.
 ## Features
 * Coherent structure across multiple databases and preprint servers
 * Cross-reference search based on the references of your findings
-* Export to advanced structured literature engines such as Ryyan or[cadima](https://www.cadima.info/)
+* Export to advanced structured literature engines such as Ryyan or [cadima](https://www.cadima.info/)
 * Excludes most duplicates across databases
+* Manual selection based on publication details (see PRISMA)
