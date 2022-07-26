@@ -1,13 +1,8 @@
 import datetime
-import json
-import numpy as np
 import findpapers as fp
-import graphviz as graphviz
-import matplotlib.pyplot as plt
 import streamlit as st
 import utils.consts as cs
 
-from matplotlib_venn import venn2, venn3
 from utils.site_config import set_page_title
 from utils.search_engine import build_search_str, single_search_str, get_search_str
 from utils.search_engine import set_build_btns, set_single_btns
@@ -77,6 +72,8 @@ else:
     databases = container.multiselect("Select one or more Databases:",
                                       options=cs.AVAILABLE_DATABASES)
 
+st.session_state.databases = databases
+
 # date picker
 st.subheader("Publication Date :calendar:")
 start_date_col, end_date_col = st.columns(2)
@@ -126,6 +123,12 @@ elif search_state and search_string != "":
     rayyan_file, rayyan_df = search_export.generate_rayyan_csv()
     ris = fp.RisExport(search)
     ris_file, ris_df = ris.generate_ris()
+
+    # store session data
+    st.session_state.search = search
+    st.session_state.rayyan_df = rayyan_df
+
+    # display results
     st.dataframe(ris_df)
 
     # download results
@@ -138,7 +141,7 @@ elif search_state and search_string != "":
     download_ris.download_button(label='CADIMA - RIS',
                                  data=ris_file,
                                  file_name='set_you_free_cadima.ris',
-                                 mime='text/plain')                              
+                                 mime='text/plain')                        
     download_csv.download_button(label='Rayyan - CSV',
                                  data=rayyan_file,
                                  file_name='set_you_free_rayyan.csv',
