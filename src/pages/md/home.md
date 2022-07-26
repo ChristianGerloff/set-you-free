@@ -1,10 +1,11 @@
 ## main
 ## Set you Free
 
-This small tool combines search results from pudding and scropus and offers some additional features to save you time in your structured literature search.
+Automated search across multiple databases and preprint servers to save your time 
+during structured literature search and review.
 
 ## Features
-* Enables a coherent structure of the search results.
-* Scropus results are used to interpolate fields that are not provided by pubmed such as open access journals
-* Excludes duplicates resulting from a common set of search results from both search engines.
-* Adds keyword based fields through simple flexible regex definitions.
+* Coherent structure across multiple databases and preprint servers
+* Cross-reference search based on the references of your findings
+* Export to advanced structured literature engines such as Ryyan or[cadima](https://www.cadima.info/)
+* Excludes most duplicates across databases
