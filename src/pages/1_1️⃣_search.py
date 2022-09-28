@@ -3,6 +3,7 @@ import findpapers as fp
 import streamlit as st
 import utils.consts as cs
 
+from stqdm import stqdm
 from utils.site_config import set_page_title
 from utils.search_engine import build_search_str, single_search_str, get_search_str
 from utils.search_engine import set_build_btns, set_single_btns
@@ -103,12 +104,16 @@ search_string = get_search_str()
 if search_state and search_string == "":
     st.error("Please enter a search string")
 elif search_state and search_string != "":
-    if ieee_api_key is None:
-        st.info('IEEE API token not found, skipping search on this database')
-    if scopus_api_key is None:
-        st.info('Scopus API token not found, skipping search on this database')
+    # if ieee_api_key is None and 'IEEE' in databases:
+    #     st.info('IEEE API token not found, skipping search on this database')
+    #     databases.remove('IEEE')
+    # if scopus_api_key is None and 'Scopus' in databases:
+    #     st.info('Scopus API token not found, skipping search on this database')
+    #     databases.remove('Scopus')
     st.write("Please wait till the results are obtained")
-    search = fp.search(None,
+    pbar = stqdm(desc='Progess', total=limit*len(databases))
+    search = fp.search(None, 
+                       pbar,
                        search_string,
                        start_date,
                        end_date,
@@ -121,7 +126,7 @@ elif search_state and search_string != "":
                        cross_reference_search=cross_search,
                        enrich=enrich,
                        similarity_threshold=similarity_threshold)
-
+    pbar.close()
     # process search results
     result_json = convert_search_to_json(search)
     search_export = fp.RayyanExport(search)
