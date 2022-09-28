@@ -103,6 +103,10 @@ search_string = get_search_str()
 if search_state and search_string == "":
     st.error("Please enter a search string")
 elif search_state and search_string != "":
+    if ieee_api_key is None:
+        st.info('IEEE API token not found, skipping search on this database')
+    if scopus_api_key is None:
+        st.info('Scopus API token not found, skipping search on this database')
     st.write("Please wait till the results are obtained")
     search = fp.search(None,
                        search_string,
