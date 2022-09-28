@@ -104,12 +104,12 @@ search_string = get_search_str()
 if search_state and search_string == "":
     st.error("Please enter a search string")
 elif search_state and search_string != "":
-    # if ieee_api_key is None and 'IEEE' in databases:
-    #     st.info('IEEE API token not found, skipping search on this database')
-    #     databases.remove('IEEE')
-    # if scopus_api_key is None and 'Scopus' in databases:
-    #     st.info('Scopus API token not found, skipping search on this database')
-    #     databases.remove('Scopus')
+    if ieee_api_key is None and 'IEEE' in databases:
+        st.info('IEEE API token not found, skipping search on this database')
+        databases.remove('IEEE')
+    if scopus_api_key is None and 'Scopus' in databases:
+        st.info('Scopus API token not found, skipping search on this database')
+        databases.remove('Scopus')
     st.write("Please wait till the results are obtained")
     pbar = stqdm(desc='Progess', total=limit*len(databases))
     search = fp.search(None, 
