@@ -131,7 +131,7 @@ elif search_state and search_string != "":
                        cross_reference_search=cross_search,
                        enrich=enrich,
                        similarity_threshold=similarity_threshold,
-                       pbar=bar)
+                       pbar=pbar)
     if show_pbar:
         pbar.close()
     # process search results
