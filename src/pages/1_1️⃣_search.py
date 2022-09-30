@@ -62,6 +62,9 @@ senitivity = st.sidebar.slider("Please select the maximum number of papers per d
                                step=cs.DUPLICATION_STEP_SLIDER)
 similarity_threshold = 1 - (senitivity - cs.DUPLICATION_MIN_SLIDER)
 
+st.sidebar.subheader("Show progress bar")
+show_pbar = st.sidebar.checkbox("Show the progress bar while downloading the papers")
+
 # database selection
 st.subheader("Select the Database(s)")
 container = st.container()
@@ -111,9 +114,11 @@ elif search_state and search_string != "":
         st.info('Scopus API token not found, skipping search on this database')
         databases.remove('Scopus')
     st.write("Please wait till the results are obtained")
-    pbar = stqdm(desc='Progess', total=limit*len(databases))
-    search = fp.search(None, 
-                       pbar,
+    if show_pbar:
+        pbar = stqdm(desc='Progess', total=limit*len(databases))
+    else:
+        pbar = None
+    search = fp.search(None,
                        search_string,
                        start_date,
                        end_date,
@@ -125,8 +130,10 @@ elif search_state and search_string != "":
                        ieee_api_token=ieee_api_key,
                        cross_reference_search=cross_search,
                        enrich=enrich,
-                       similarity_threshold=similarity_threshold)
-    pbar.close()
+                       similarity_threshold=similarity_threshold
+                       pbar=bar)
+    if show_pbar:
+        pbar.close()
     # process search results
     result_json = convert_search_to_json(search)
     search_export = fp.RayyanExport(search)
