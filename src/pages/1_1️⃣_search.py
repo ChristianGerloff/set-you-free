@@ -130,7 +130,7 @@ elif search_state and search_string != "":
                        ieee_api_token=ieee_api_key,
                        cross_reference_search=cross_search,
                        enrich=enrich,
-                       similarity_threshold=similarity_threshold
+                       similarity_threshold=similarity_threshold,
                        pbar=bar)
     if show_pbar:
         pbar.close()
