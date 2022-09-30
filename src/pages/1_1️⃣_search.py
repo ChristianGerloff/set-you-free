@@ -63,7 +63,8 @@ senitivity = st.sidebar.slider("Please select the maximum number of papers per d
 similarity_threshold = 1 - (senitivity - cs.DUPLICATION_MIN_SLIDER)
 
 st.sidebar.subheader("Show progress bar")
-show_pbar = st.sidebar.checkbox("Show the progress bar while downloading the papers")
+show_pbar = st.sidebar.checkbox("Show the progress bar while downloading the papers",
+                                value=True)
 
 # database selection
 st.subheader("Select the Database(s)")
