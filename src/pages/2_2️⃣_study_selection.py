@@ -43,8 +43,7 @@ else:
     gb.configure_pagination(paginationAutoPageSize=True)
     build_gb = gb.build()
     grid = AgGrid(
-        dataframe=st.session_state.review,
-        width='100%',
+        data=st.session_state.review,
         update_mode=GridUpdateMode.__members__['MODEL_CHANGED'],
         data_return_mode=DataReturnMode.__members__['AS_INPUT'],
         gridOptions=build_gb,
