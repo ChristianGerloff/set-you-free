@@ -15,9 +15,6 @@ poetry.lock
 # docker
 Dockerfile
 
-# shell scripts
-*.sh
-
 # vscode
 .vscode
 
