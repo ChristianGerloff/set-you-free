@@ -5,7 +5,7 @@ description = "Structured Literature Search "
 authors = ["Christia Gerloff <christian.gerloff@rwth-aachen.de>"]
 
 [tool.poetry.dependencies]
-python = ">=3.8.0,<4.0.0"
+python = ">=3.10.0,<4.0.0"
 streamlit = "^1.11.0"
 findpapers = {git = "https://github.com/ChristianGerloff/findpapers.git", branch = "develop"}
 graphviz = "^0.20.1"
