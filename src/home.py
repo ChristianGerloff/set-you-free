@@ -1,7 +1,7 @@
 import streamlit as st
 
 from pathlib import Path
-from utils.site_config import set_page_title, set_page_style
+from utils.site_config import set_page_title
 
 @st.cache
 def get_home_md() -> str:

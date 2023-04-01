@@ -17,7 +17,7 @@ if 'rayyan_df' not in st.session_state:
 elif 'review' in st.session_state:
     review = st.session_state.review.copy()
     final_search = st.session_state.search
-    papers = review.loc[review['decision'] == False, ['title', 'date', 'doi']]
+    papers = review.loc[review["decision"] is False, ['title', 'date', 'doi']]
 
     if not papers.empty:
         for _, p in papers.iterrows():

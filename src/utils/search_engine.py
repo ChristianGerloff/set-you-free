@@ -30,7 +30,7 @@ def join_string_in_list(list_of_string: list) -> str:
     Returns:
         str: All queries combined.
     """
-    return ' '.join(list_of_string)
+    return " ".join(list_of_string)
 
 
 def get_search_str():
@@ -54,9 +54,12 @@ def build_search_str():
         str: Search string.
     """
     search_str_col, operator_col = st.columns([3, 1])
-    search_string = search_str_col.text_input("Please enter the search string (e.g., fNIRS)", "")
-    operator = operator_col.selectbox("Please select how to join your search strings",
-                                      cs.JOIN_TYPES)
+    search_string = search_str_col.text_input(
+        "Please enter the search string (e.g., fNIRS)", ""
+    )
+    operator = operator_col.selectbox(
+        "Please select how to join your search strings", cs.JOIN_TYPES
+    )
     add_button = st.button("Add")
 
     if "query_string" not in st.session_state:
@@ -90,7 +93,8 @@ def single_search_str():
     search_string = st.text_input(
         "Please enter the search string (e.g., [ASD] AND [fMRI])",
         "",
-        help=cs.HELP_SEARCH_STRING)
+        help=cs.HELP_SEARCH_STRING,
+    )
     add_button = st.button("Add")
 
     if add_button and search_string == "":
@@ -112,13 +116,14 @@ def clear_search_str(search_str_txt, clear_all: bool = False):
         clear_all (bool, optional): Clear all search string. Defaults to False.
     """
     # None operator
-    if (len(st.session_state.query_string) > 1 and
-       clear_all is False):
+    if len(st.session_state.query_string) > 1 and clear_all is False:
         del st.session_state.query_string[-1:]
     # operator
-    elif (len(st.session_state.query_string) > 1 and
-          clear_all is True and
-          st.session_state.query_string[-2] in cs.JOIN_TYPES):
+    elif (
+        len(st.session_state.query_string) > 1
+        and clear_all is True
+        and st.session_state.query_string[-2] in cs.JOIN_TYPES
+    ):
         del st.session_state.query_string[-2:]
     elif isinstance(st.session_state.query_string, list):
         st.session_state.query_string.clear()
