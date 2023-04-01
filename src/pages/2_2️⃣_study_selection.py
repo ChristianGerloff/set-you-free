@@ -22,7 +22,7 @@ else:
     criterias = 'default' if criterias == '' else criterias
 
     st.sidebar.info(
-        f"Reviewed papers: {len(st.session_state.review[st.session_state.review.reviewed is True])} of "
+        f"Reviewed papers: {len(st.session_state.review[st.session_state.review.reviewed == True])} of "
         f"{len(st.session_state.review)}"
     )
 
