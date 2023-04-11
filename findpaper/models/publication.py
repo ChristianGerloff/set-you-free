@@ -46,14 +46,9 @@ class Publication(BaseModel):
                 value = None
         return value
     
-    @validator("category")
-    def set_category(cls, value: str, values: dict) -> str:
-        return value if value is not None else values["title"]
-    
     @validator("subject_areas")
-    def set_subject_areas(cls, value: str) -> set[str]:
+    def set_subject_areas(cls, value: Union[set[str], None]) -> set[str]:
         return value if value is not None else set()
-    
     
     def enrich(self, publication: 'Publication') -> 'Publication':
         self.title = publication.title if self.title is None or len(self.title) < len(publication.title) else self.title
