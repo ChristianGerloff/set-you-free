@@ -30,7 +30,7 @@ class Publication(BaseModel):
         return value
     
     @validator("category")
-    def check_category(cls, value):
+    def check_category(cls, value: str) -> Union[str, None]:
         if value is not None:
             if 'journal' in value.lower():
                 value = 'Journal'
@@ -47,11 +47,11 @@ class Publication(BaseModel):
         return value
     
     @validator("category")
-    def set_category(cls, value, values) -> str:
+    def set_category(cls, value: str, values: dict) -> str:
         return value if value is not None else values["title"]
     
     @validator("subject_areas")
-    def set_subject_areas(cls, value) -> Union[set, None]:
+    def set_subject_areas(cls, value: str) -> set[str]:
         return value if value is not None else set()
     
     
