@@ -5,16 +5,16 @@ from pydantic import BaseModel, Field, validator
 
 
 class Publication(BaseModel):
-    title: str = Field(..., examples="Fake title")
-    isbn: Optional[str] = Field(None, examples="1234567890")
-    issn: Optional[str] = Field(None, examples="12345678", max_length=8, min_length=8)
-    publisher: Optional[str] = Field(None, examples="Fake publisher")
-    category: Optional[str] = Field(None, examples="journal")
-    cite_score: Optional[Decimal] = Field(None, examples=[1.0], ge=0.0, decimal_places=1)
-    sjr: Optional[Decimal] = Field(None, examples=[2.0], ge=0.0, decimal_places=1)
-    snip: Optional[Decimal] = Field(None, examples=[3.0], ge=0.0, decimal_places=1)
-    subject_areas: Optional[set[str]] = Field(None, examples=["Fake subject area"])
-    is_potentially_predatory: Optional[bool] = Field(None, examples=True)
+    title: str = Field(..., examples="Fake title", description="Title of the publication.")
+    isbn: Optional[str] = Field(None, examples="1234567890", description="ISBN of the publication.")
+    issn: Optional[str] = Field(None, examples="12345678", max_length=8, min_length=8, description="ISSN of the publication.")
+    publisher: Optional[str] = Field(None, examples="Fake publisher", description="Publisher of the publication.")
+    category: Optional[str] = Field(None, examples="journal", description="Category of the publication.")
+    cite_score: Optional[Decimal] = Field(None, examples=[1.0], ge=0.0, decimal_places=1, description="Citation score of the publication.")
+    sjr: Optional[Decimal] = Field(None, examples=[2.0], ge=0.0, decimal_places=1, description="SJR of the publication.")
+    snip: Optional[Decimal] = Field(None, examples=[3.0], ge=0.0, decimal_places=1, description="SNIP of the publication.")
+    subject_areas: Optional[set[str]] = Field(None, examples=["Fake subject area"], description="Subject areas of the publication.")
+    is_potentially_predatory: Optional[bool] = Field(None, examples=True, description="Whether the publication is potentially predatory.")
     
     @validator("title")
     def check_title(cls, value: str) -> str:
