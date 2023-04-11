@@ -17,33 +17,39 @@ def test_publication_isbn_is_none(publication: Publication):
 
 
 def test_category(publication: Publication):
-    assert publication.category in ["Journal", "Book", "Thesis", "Conference Proceedings", "Preprint"]
+    assert publication.category in [
+        "Journal",
+        "Book",
+        "Thesis",
+        "Conference Proceedings",
+        "Preprint",
+    ]
 
 
 def test_from_dict_data_type():
     publication_dict = {
-        'title': 'Fake title',
-        'isbn': '1234567890',
-        'issn': '12345678',
-        'publisher': 'Fake publisher',
-        'category': 'journal',
-        'cite_score': Decimal(1.0),
-        'sjr': Decimal(2.0),
-        'snip': Decimal(3.0),
-        'subject_areas': {'Fake subject area 1', 'Fake subject area 2'},
-        'is_potentially_predatory': True,
+        "title": "Fake title",
+        "isbn": "1234567890",
+        "issn": "12345678",
+        "publisher": "Fake publisher",
+        "category": "journal",
+        "cite_score": Decimal(1.0),
+        "sjr": Decimal(2.0),
+        "snip": Decimal(3.0),
+        "subject_areas": {"Fake subject area 1", "Fake subject area 2"},
+        "is_potentially_predatory": True,
     }
     publication = Publication.from_dict(publication_dict)
     assert isinstance(publication, Publication)
-    assert publication.title == 'Fake title'
-    assert publication.isbn == '1234567890'
-    assert publication.issn == '12345678'
-    assert publication.publisher == 'Fake publisher'
-    assert publication.category == 'Journal'
-    assert publication.cite_score == Decimal('1.0')
-    assert publication.sjr == Decimal('2.0')
-    assert publication.snip == Decimal('3.0')
-    assert publication.subject_areas == {'Fake subject area 1', 'Fake subject area 2'}
+    assert publication.title == "Fake title"
+    assert publication.isbn == "1234567890"
+    assert publication.issn == "12345678"
+    assert publication.publisher == "Fake publisher"
+    assert publication.category == "Journal"
+    assert publication.cite_score == Decimal("1.0")
+    assert publication.sjr == Decimal("2.0")
+    assert publication.snip == Decimal("3.0")
+    assert publication.subject_areas == {"Fake subject area 1", "Fake subject area 2"}
     assert publication.is_potentially_predatory is True
 
 
@@ -56,16 +62,16 @@ def test_publication(publication: Publication):
     publication.publisher = None
     publication.category = None
     publication.subject_areas = set()
-    
+
     another_publication: Publication = create_publication_event()
-    another_publication.title = 'Another publication'
+    another_publication.title = "Another publication"
     another_publication.cite_score = Decimal(1.0)
     another_publication.sjr = Decimal(2.0)
     another_publication.snip = Decimal(3.0)
-    another_publication.subject_areas = {'area A'}
-    
+    another_publication.subject_areas = {"area A"}
+
     publication.enrich(another_publication)
-    
+
     assert publication.cite_score == another_publication.cite_score
     assert publication.sjr == another_publication.sjr
     assert publication.snip == another_publication.snip
@@ -73,4 +79,4 @@ def test_publication(publication: Publication):
     assert publication.isbn == another_publication.isbn
     assert publication.publisher == another_publication.publisher
     assert publication.category == another_publication.category
-    assert 'area A' in publication.subject_areas
+    assert "area A" in publication.subject_areas
