@@ -1,7 +1,7 @@
 import pytest
 from datetime import date
 
-from findpaper.models.paper import Paper
+from findpapers.models.paper import Paper
 from tests.integration.utils.paper_utils import create_paper_event
 from tests.integration.factories.publication_factory import (
     PublicationFactory,

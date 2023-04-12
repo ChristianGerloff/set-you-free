@@ -3,8 +3,8 @@ from datetime import date
 from typing import List, Optional, Union
 
 from pydantic import BaseModel, Field, validator
-from findpaper.models.publication import Publication
-from findpaper.data.available_databases import AVAILABLE_DATABASES
+from findpapers.models.publication import Publication
+from findpapers.data.available_databases import AVAILABLE_DATABASES
 
 class Paper(BaseModel):
     title: str = Field(..., examples="Fake title", description="Title of the paper.")

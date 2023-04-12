@@ -1,7 +1,7 @@
 import pytest
 
-from findpaper.models.paper import Paper
-from findpaper.models.publication import Publication
+from findpapers.models.paper import Paper
+from findpapers.models.publication import Publication
 from tests.integration.utils.paper_utils import create_paper_event
 from tests.integration.utils.publication_utils import create_publication_event
 

@@ -3,7 +3,7 @@ from random import choice
 from pydantic_factories import ModelFactory, Use
 from faker import Faker
 
-from findpaper.models.publication import Publication
+from findpapers.models.publication import Publication
 
 faker = Faker("en_US")
 

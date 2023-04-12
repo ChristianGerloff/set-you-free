@@ -1,7 +1,7 @@
 from decimal import Decimal
 import pytest
 
-from findpaper.models.publication import Publication
+from findpapers.models.publication import Publication
 from tests.integration.utils.publication_utils import create_publication_event
 
 
