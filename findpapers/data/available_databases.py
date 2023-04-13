@@ -8,5 +8,5 @@ AVAILABLE_DATABASES = [
     "medRxiv",
     "bioRxiv",
     "OC",
-    "CR"
+    "CR",
 ]

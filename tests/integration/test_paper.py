@@ -38,6 +38,10 @@ def test_incorrect_source(paper: Paper):
     )
 
 
+def test_to_dict_data_type(paper: Paper):
+    assert isinstance(paper.dict(), dict)
+
+
 def test_incorrect_database(paper: Paper):
     database_name = "test"
     with pytest.raises(ValueError) as exc_info:

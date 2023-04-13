@@ -26,6 +26,10 @@ def test_category(publication: Publication):
     ]
 
 
+def test_to_dict_data_type(publication: Publication):
+    assert isinstance(publication.dict(), dict)
+
+
 def test_from_dict_data_type():
     publication_dict = {
         "title": "Fake title",

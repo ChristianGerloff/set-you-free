@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field, validator
 from findpapers.models.publication import Publication
 from findpapers.data.available_databases import AVAILABLE_DATABASES
 
+
 class Paper(BaseModel):
     title: str = Field(..., examples="Fake title", description="Title of the paper.")
     abstract: str = Field(
@@ -65,7 +66,7 @@ class Paper(BaseModel):
     source: str = Field(
         default="primary", examples=["primary"], description="Source of the paper."
     )
-    
+
     @validator("title")
     def check_title(cls, value: str) -> str:
         if not value:
@@ -106,7 +107,6 @@ class Paper(BaseModel):
         self.urls.add(url)
 
     def enrich(self, paper: "Paper") -> "Paper":
-
         self.publication_date = (
             paper.publication_date
             if self.publication_date is None
