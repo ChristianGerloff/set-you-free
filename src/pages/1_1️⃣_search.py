@@ -5,8 +5,8 @@ import utils.consts as cs
 
 from stqdm import stqdm
 from utils.site_config import set_page_title
-from utils.search_engine import build_search_str, single_search_str, get_search_str
-from utils.search_engine import set_build_btns, set_single_btns
+from utils.search_engine import single_search_str, get_search_str
+from utils.search_engine import set_single_btns
 from utils.search_engine import convert_search_to_json
 
 # configure page
@@ -34,7 +34,7 @@ if enrich is True or cross_search is True:
 pub_types = st.sidebar.multiselect("Select one or more publication types:",
                                    options=cs.AVAILABLE_PUBTYPES,
                                    default=cs.DEFAULT_PUBTYPES)
-pub_types = None if pub_types == '' else pub_types
+pub_types = None if pub_types == '' or 'all' else pub_types
 
 # API keys
 st.sidebar.subheader("Please enter the following API keys")
@@ -95,17 +95,9 @@ end_date = end_date_col.date_input("end date")
 
 # query
 st.subheader("Search String")
-search_str_type = st.selectbox(
-    "How would you like to enter the search string?",
-    cs.SEARCH_STRING_TYPE
-)
 
-if search_str_type == cs.SEARCH_STRING_TYPE[1]:
-    search_str_txt = build_search_str()
-    search_state = set_build_btns(search_str_txt)
-elif search_str_type == cs.SEARCH_STRING_TYPE[0]:
-    search_str_txt = single_search_str()
-    search_state = set_single_btns(search_str_txt)
+search_str_txt = single_search_str()
+search_state = set_single_btns(search_str_txt)
 
 
 search_string = get_search_str()
@@ -141,6 +133,11 @@ elif search_state and search_string != "":
                        pbar=pbar)
     if show_pbar:
         pbar.close()
+
+    if len(search.papers) == 0:
+        st.warning("No search results found!")
+        st.stop()
+
     # process search results
     result_json = convert_search_to_json(search)
     search_export = fp.RayyanExport(search)
@@ -148,12 +145,18 @@ elif search_state and search_string != "":
     ris = fp.RisExport(search)
     ris_file, ris_df = ris.generate_ris()
 
-    # Export to RIS file
-    if ris_df is None:
-        st.warning("No search results to export!")
+    # store session data
+    if 'review' not in st.session_state:
+        st.session_state.search = search
+        st.session_state.ris_df = ris_df.copy()
+        st.session_state.rayyan_df = rayyan_df.copy()
+        st.session_state.review = ris_df.copy()
+        st.session_state.review.insert(1, 'criteria', 'default')
+        st.session_state.review.insert(1, 'decision', True)
+        st.session_state.review.insert(1, 'reviewed', False)
     else:
-        # store session data
-        if 'review' not in st.session_state:
+        st.info("Override results!!!")
+        if st.button("Yes I'm ready to override"):
             st.session_state.search = search
             st.session_state.ris_df = ris_df.copy()
             st.session_state.rayyan_df = rayyan_df.copy()
@@ -161,17 +164,6 @@ elif search_state and search_string != "":
             st.session_state.review.insert(1, 'criteria', 'default')
             st.session_state.review.insert(1, 'decision', True)
             st.session_state.review.insert(1, 'reviewed', False)
-
-        else:
-            st.info("Override results!!!")
-            if st.button("Yes I'm ready to override"):
-                st.session_state.search = search
-                st.session_state.ris_df = ris_df.copy()
-                st.session_state.rayyan_df = rayyan_df.copy()
-                st.session_state.review = ris_df.copy()
-                st.session_state.review.insert(1, 'criteria', 'default')
-                st.session_state.review.insert(1, 'decision', True)
-                st.session_state.review.insert(1, 'reviewed', False)
 
         # display results
         st.dataframe(ris_df)

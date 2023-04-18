@@ -28,8 +28,14 @@ SEARCH_STRING_TYPE = [
     "Insert search string directly",
     "Build search string"
 ]
-AVAILABLE_PUBTYPES = ['journal', 'preprint', 'conference', 'book']
-DEFAULT_PUBTYPES = ['journal', 'preprint']
+AVAILABLE_PUBTYPES = [
+        'all',
+        'journal',
+        'preprint',
+        'conference proceedings',
+        'book'
+    ]
+DEFAULT_PUBTYPES = ['all']
 HELP_ENRICH = (
     "Enrich aims to combine information across different databases to complete "
     "missing information of a publication."

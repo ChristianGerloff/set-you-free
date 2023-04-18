@@ -55,7 +55,11 @@ def build_search_str():
     """
     search_str_col, operator_col = st.columns([3, 1])
     search_string = search_str_col.text_input(
-        "Please enter the search string (e.g., fNIRS)", ""
+        (
+            "Please enter the search string"
+            "(e.g., [term a] OR ([term b] AND ([term c] OR [term d])"
+        ),
+        ""
     )
     operator = operator_col.selectbox(
         "Please select how to join your search strings", cs.JOIN_TYPES
@@ -91,7 +95,10 @@ def single_search_str():
         st.session_state.query_string = []
 
     search_string = st.text_input(
-        "Please enter the search string (e.g., [ASD] AND [fMRI])",
+        (
+            "Please enter the search string"
+            "(e.g., [term a] OR ([term b] AND ([term c] OR [term d])"
+        ),
         "",
         help=cs.HELP_SEARCH_STRING,
     )
