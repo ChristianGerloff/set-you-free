@@ -18,6 +18,8 @@ def test_search_query_is_none(search: Search):
 
 def test_set_query(search: Search):
     new_query = "New query"
+    assert search.query != new_query
+
     search.set_query(new_query)
     assert search.query == new_query
 
