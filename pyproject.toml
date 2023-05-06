@@ -15,10 +15,11 @@ stqdm = "^0.0.4"
 pydantic = "^1.10.7"
 
 [tool.poetry.group.dev.dependencies]
-pydantic-factories = "^1.17.2"
 pytest = "^7.2.2"
 ruff = "^0.0.261"
-
+flake8 = "^6.0.0"
+black = "^23.3.0"
+polyfactory = "^2.1.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

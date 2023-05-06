@@ -1,6 +1,6 @@
 from random import choice
 
-from pydantic_factories import ModelFactory, Use
+from polyfactory.factories.pydantic_factory import ModelFactory, Use
 from faker import Faker
 
 from findpapers.models.publication import Publication
