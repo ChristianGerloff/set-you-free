@@ -47,3 +47,12 @@ HELP_CROSS_REF = (
 HELP_SEARCH_STRING = (
     "[term a] OR ([term b] AND ([term c] OR [term d]"
 )
+
+ORDER_SEARCH_RESULTS = [
+    'title',
+    'journal_name',
+    'date',
+    'authors',
+    'abstract',
+    'keywords'
+]
