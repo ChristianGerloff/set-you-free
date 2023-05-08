@@ -3,7 +3,7 @@ import streamlit as st
 from pathlib import Path
 from utils.site_config import set_page_title
 
-@st.cache
+@st.cache_resource
 def get_home_md() -> str:
     """Returns home
 
