@@ -1,22 +1,25 @@
+import copy
+from datetime import date, datetime
+
 import pytest
 
-from datetime import date, datetime
 from findpapers.models.paper import Paper
 from findpapers.models.search import Search
+from tests.integration.utils.paper_utils import create_paper_event
 
 
-def test_search_query_is_not_none(search: Search):
+def test_that_search_query_is_not_none(search: Search) -> None:
     assert search.query
 
 
-def test_search_query_is_none(search: Search):
+def test_that_search_query_is_none(search: Search) -> None:
     search.query = None
     with pytest.raises(ValueError) as exc_info:
         search.check_query(search.query)
     assert str(exc_info.value) == "Search query is missing."
 
 
-def test_set_query(search: Search):
+def test_set_query(search: Search) -> None:
     new_query = "New query"
     assert search.query != new_query
 
@@ -24,41 +27,38 @@ def test_set_query(search: Search):
     assert search.query == new_query
 
 
-def test_to_dict_data_type(search: Search):
+def test_to_dict_data_type(search: Search) -> None:
     assert isinstance(search.dict(), dict)
 
 
-def test_incorrect_database(search: Search):
+def test_incorrect_database(search: Search) -> None:
     database_name = "test"
     with pytest.raises(ValueError) as exc_info:
         search.add_database(database_name=database_name)
     assert str(exc_info.value) == f"Database {database_name} is not supported."
 
 
-def test_get_paper_key(search: Search):
+def test_get_paper_key(search: Search) -> None:
     paper_title = "FAKE-TITLE"
-    publication_date = date(1996, 9, 8)
+    paper_publication_date = date(1996, 9, 8)
     paper_doi = "FAKE-DOI"
 
     assert (
         search.get_paper_key(
             paper_title=paper_title,
-            publication_date=publication_date,
+            paper_publication_date=paper_publication_date,
             paper_doi=paper_doi,
         )
         == f"DOI-{paper_doi}"
     )
     assert (
-        search.get_paper_key(paper_title=paper_title, publication_date=publication_date)
+        search.get_paper_key(paper_title=paper_title, paper_publication_date=paper_publication_date)
         == f"{paper_title.lower()}|1996"
     )
-    assert (
-        search.get_paper_key(paper_title=paper_title, publication_date=None)
-        == f"{paper_title.lower()}|"
-    )
+    assert search.get_paper_key(paper_title=paper_title, paper_publication_date=None) == f"{paper_title.lower()}|"
 
 
-def test_get_publication_key(search: Search):
+def test_get_publication_key(search: Search) -> None:
     publication_title = "FAKE-TITLE"
     publication_issn = "FAKE-ISSN"
     publication_isbn = "FAKE-ISBN"
@@ -72,43 +72,17 @@ def test_get_publication_key(search: Search):
         == f"ISSN-{publication_issn.lower()}"
     )
     assert (
-        search.get_publication_key(
-            publication_title=publication_title, publication_issn=publication_issn
-        )
+        search.get_publication_key(publication_title=publication_title, publication_issn=publication_issn)
         == f"ISSN-{publication_issn.lower()}"
     )
     assert (
-        search.get_publication_key(
-            publication_title=publication_title, publication_isbn=publication_isbn
-        )
+        search.get_publication_key(publication_title=publication_title, publication_isbn=publication_isbn)
         == f"ISBN-{publication_isbn.lower()}"
     )
-    assert (
-        search.get_publication_key(publication_title=publication_title)
-        == f"TITLE-{publication_title.lower()}"
-    )
+    assert search.get_publication_key(publication_title=publication_title) == f"TITLE-{publication_title.lower()}"
 
 
-# TODO: these have to be corrected once the add_paper method is correctly implemented
-# def test_get_paper(paper: Paper, search: Search):
-#     search.add_paper(paper)
-#     assert paper == search.get_paper(
-#         paper_title=paper.title,
-#         publication_date=paper.publication_date,
-#         paper_doi=paper.doi,
-#     )
-
-
-# def test_get_publication(paper: Paper, search: Search):
-#     search.add_paper(paper)
-#     assert paper.publication == search.get_publication(
-#         title=paper.publication.title,
-#         issn=paper.publication.issn,
-#         isbn=paper.publication.isbn,
-#     )
-
-
-def test_from_dict_data_type():
+def test_from_dict_data_type() -> None:
     search_dict = {
         "query": "Random query",
         "since": date(1996, 9, 8),
@@ -146,6 +120,67 @@ def test_from_dict_data_type():
     assert not search.papers_by_database
 
 
-def test_search(paper: Paper, search: Search):
+def test_search(paper: Paper, search: Search) -> None:
     paper.doi = None
+
     assert not search.papers  # can be either 0 or none
+
+    # made these as None because of the following condition in search.add_paper
+    # if (self.since is None or paper.publication_date >= self.since) and (
+    #         self.until is None or paper.publication_date <= self.until
+    #     )
+    search.since = None
+    search.until = None
+
+    search.add_paper(paper)
+    assert len(search.papers) == 1
+    search.add_paper(paper)
+    assert len(search.papers) == 1
+
+    another_paper: Paper = create_paper_event()
+
+    # added the title & abstract so that the paper & another_paper instance aren't equal
+    another_paper.title = "awesome paper title 2"
+    another_paper.abstract = "a long abstract"
+    another_paper.add_database("arXiv")
+
+    search.add_paper(another_paper)
+    assert len(search.papers) == 2
+
+    assert paper == search.get_paper(paper.title, paper.publication_date, paper.doi)
+    assert paper.publication == search.get_publication(
+        paper.publication.title,
+        paper.publication.issn,
+        paper.publication.isbn,
+    )
+
+    search.remove_paper(another_paper)
+    assert len(search.papers) == 1
+    assert paper in search.papers
+
+    search.limit_per_database = 1
+    with pytest.raises(OverflowError) as exc_info:
+        search.add_paper(another_paper)
+    assert str(exc_info.value) == "When the papers limit is provided, you cannot exceed it."
+
+    search.limit_per_database = 2
+    search.add_paper(another_paper)
+    assert len(search.papers) == 2
+
+    another_paper_2: Paper = copy.deepcopy(paper)
+    another_paper_2.title = "awesome paper title 3"
+    another_paper_2.abstract = "a long abstract"
+    another_paper_2.databases = set()
+
+    with pytest.raises(ValueError) as exc_info:
+        search.add_paper(another_paper_2)
+    assert str(exc_info.value) == ("Paper cannot be added to search without at least one defined database.")
+
+    another_paper_2.add_database("arXiv")
+
+    with pytest.raises(OverflowError):
+        search.add_paper(another_paper_2)
+
+    # TODO: check why this isn't working
+    # search.merge_duplications()
+    # assert len(search.papers) == 1
