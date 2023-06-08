@@ -1,22 +1,23 @@
 from decimal import Decimal
+
 import pytest
 
 from findpapers.models.publication import Publication
 from tests.integration.utils.publication_utils import create_publication_event
 
 
-def test_publication_title_is_not_none(publication: Publication):
+def test_publication_title_is_not_none(publication: Publication) -> None:
     assert publication.title is not None
 
 
-def test_publication_isbn_is_none(publication: Publication):
+def test_publication_isbn_is_none(publication: Publication) -> None:
     publication.title = None
     with pytest.raises(ValueError) as exc_info:
         Publication.check_title(publication.title)
     assert str(exc_info.value) == "Publication's title is missing."
 
 
-def test_category(publication: Publication):
+def test_category(publication: Publication) -> None:
     assert publication.category in [
         "Journal",
         "Book",
@@ -26,11 +27,11 @@ def test_category(publication: Publication):
     ]
 
 
-def test_to_dict_data_type(publication: Publication):
+def test_to_dict_data_type(publication: Publication) -> None:
     assert isinstance(publication.dict(), dict)
 
 
-def test_from_dict_data_type():
+def test_from_dict_data_type() -> None:
     publication_dict = {
         "title": "Fake title",
         "isbn": "1234567890",
@@ -57,7 +58,7 @@ def test_from_dict_data_type():
     assert publication.is_potentially_predatory is True
 
 
-def test_publication(publication: Publication):
+def test_publication(publication: Publication) -> None:
     publication.issn = None
     publication.isbn = None
     publication.cite_score = None

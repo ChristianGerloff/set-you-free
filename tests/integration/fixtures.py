@@ -1,11 +1,11 @@
 import pytest
 
 from findpapers.models.paper import Paper
-from findpapers.models.search import Search
 from findpapers.models.publication import Publication
+from findpapers.models.search import Search
 from tests.integration.utils.paper_utils import create_paper_event
-from tests.integration.utils.search_utils import create_search_event
 from tests.integration.utils.publication_utils import create_publication_event
+from tests.integration.utils.search_utils import create_search_event
 
 
 @pytest.fixture

@@ -1,7 +1,8 @@
 from random import choice
 
-from polyfactory.factories.pydantic_factory import ModelFactory, Use
 from faker import Faker
+from polyfactory.factories.pydantic_factory import ModelFactory
+from polyfactory.fields import Use
 
 from findpapers.models.publication import Publication
 
@@ -15,5 +16,5 @@ class PublicationFactory(ModelFactory):
     issn = faker.ean(length=8)
     publisher = Use(faker.company)
     category = choice(
-        ["journal", "conference", "proceeding", "book", "preprint", "thesis"]
+        ["journal", "conference", "proceeding", "book", "preprint", "thesis"],
     )

@@ -1,6 +1,6 @@
 from tests.integration.factories.publication_factory import (
-    PublicationFactory,
     Publication,
+    PublicationFactory,
 )
 
 

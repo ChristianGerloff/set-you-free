@@ -1,55 +1,53 @@
-import pytest
 from datetime import date
 
+import pytest
+
 from findpapers.models.paper import Paper
-from tests.integration.utils.paper_utils import create_paper_event
 from tests.integration.factories.publication_factory import (
-    PublicationFactory,
     Publication,
+    PublicationFactory,
 )
+from tests.integration.utils.paper_utils import create_paper_event
 
 
-def test_paper_title_is_not_none(paper: Paper):
+def test_paper_title_is_not_none(paper: Paper) -> None:
     assert paper.title is not None
 
 
-def test_paper_title_is_none(paper: Paper):
+def test_paper_title_is_none(paper: Paper) -> None:
     paper.title = None
     with pytest.raises(ValueError) as exc_info:
         paper.check_title(paper.title)
     assert str(exc_info.value) == "Paper's title is missing."
 
 
-def test_publication_date_is_none(paper: Paper):
+def test_publication_date_is_none(paper: Paper) -> None:
     paper.publication_date = None
     with pytest.raises(ValueError) as exc_info:
         paper.check_publication_date(paper.publication_date)
     assert str(exc_info.value) == "Paper's publication_date is missing."
 
 
-def test_incorrect_source(paper: Paper):
+def test_incorrect_source(paper: Paper) -> None:
     paper.source = "qwerty"
     sources = ["primary", "references", "cites"]
     with pytest.raises(ValueError) as exc_info:
         paper.check_source(paper.source)
-    assert (
-        str(exc_info.value)
-        == f"Source of the paper is invalid. Valid sources are {sources}."
-    )
+    assert str(exc_info.value) == f"Source of the paper is invalid. Valid sources are {sources}."
 
 
-def test_to_dict_data_type(paper: Paper):
+def test_to_dict_data_type(paper: Paper) -> None:
     assert isinstance(paper.dict(), dict)
 
 
-def test_incorrect_database(paper: Paper):
+def test_incorrect_database(paper: Paper) -> None:
     database_name = "test"
     with pytest.raises(ValueError) as exc_info:
         paper.add_database(database_name=database_name)
     assert str(exc_info.value) == f"Database {database_name} is not supported."
 
 
-def test_from_dict_data_type():
+def test_from_dict_data_type() -> None:
     # TODO: add categories once its function usage is cleared
     paper_dict = {
         "title": "Fake title",
@@ -86,7 +84,7 @@ def test_from_dict_data_type():
     assert isinstance(paper.publication, Publication)
 
 
-def test_paper(paper: Paper):
+def test_paper(paper: Paper) -> None:
     assert len(paper.authors) == 5
     assert len(paper.databases) == 3
 
