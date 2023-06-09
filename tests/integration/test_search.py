@@ -176,6 +176,5 @@ class TestSearch:
         with pytest.raises(OverflowError):
             search.add_paper(another_paper_2)
 
-        # TODO: check why this isn't working
-        # search.merge_duplications()
-        # assert len(search.papers) == 1
+        search.merge_duplications()
+        assert len(search.papers) == 2

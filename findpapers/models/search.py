@@ -223,6 +223,7 @@ class Search(BaseModel):
         for _, pair in enumerate(paper_key_pairs):
             paper_1 = self.paper_by_key.get(pair[0])
             paper_2 = self.paper_by_key.get(pair[1])
+
             # check if de-duplication can be performed
             if not (paper_1 and paper_2 and not paper_1.title and not paper_2.title):
                 continue
@@ -306,7 +307,6 @@ class Search(BaseModel):
             and database in self.papers_by_database
             and n_dbs >= self.limit_per_database
         )
-
         return reached_general_limit or reached_database_limit
 
     @classmethod
