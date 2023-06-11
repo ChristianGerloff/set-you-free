@@ -12,32 +12,31 @@ DATABASE_LABEL = "CR"  # short for opencitations
 SPLIT_AUTHOR = "; "
 
 
-class DateConverter(object):
+class DateConverter:
     def __init__(self, date_parts: list) -> None:
         self.date_parts = date_parts
-        date_functions = {3: "_ymd_date", 2: "_ym_date", 1: "_y_date"}
+        self.date = self.convert_date()
 
-        date_getter = date_functions.get(len(date_parts))
-        converter = getattr(self, date_getter)
-        converter()
-        self.date = date(year=self.year, month=self.month, day=self.day)
+    def convert_date(self) -> date:
+        if len(self.date_parts) not in [1, 2, 3]:
+            raise ValueError("Invalid number of date parts")
+        date_functions = {3: self._ymd_date, 2: self._ym_date, 1: self._y_date}
+        return date_functions[len(self.date_parts)]()
 
-    def _ymd_date(self) -> None:
-        self.year = int(self.date_parts[0])
-        self.month = int(self.date_parts[1])
-        self.day = int(self.date_parts[2])
+    def _ymd_date(self) -> date:
+        year, month, day = map(int, self.date_parts)
+        return date(year=year, month=month, day=day)
 
-    def _ym_date(self) -> None:
-        self.year = int(self.date_parts[0])
-        self.month = int(self.date_parts[1])
-        self.day = 1
+    def _ym_date(self) -> date:
+        year, month = map(int, self.date_parts)
+        return date(year=year, month=month, day=1)
 
-    def _y_date(self) -> None:
-        self.year = int(self.date_parts[0])
-        self.month = 1
-        self.day = 1
+    def _y_date(self) -> date:
+        year = int(self.date_parts[0])
+        return date(year=year, month=1, day=1)
 
 
+# In place of using the URL, https://github.com/fabiobatalha/crossrefapi is used.
 def _get_paper_entry(doi: str) -> dict:
     """Use the DOI and extract the metadata of the paper from Crossref API.
 
@@ -59,6 +58,7 @@ def _get_publication(paper_entry: dict) -> Publication:
     Returns:
         Publication: A publication instance.
     """
+    # TODO: why is container-title used here if the paper_entry has title key?
     publication_title = (
         DATABASE_LABEL if not paper_entry.get("container-title") else paper_entry.get("container-title")[0]
     )
@@ -114,13 +114,13 @@ def _get_paper(paper_entry: dict, publication: Publication) -> Paper:
 
     paper_authors = [f"{a.get('family')}, {a.get('given')}" for a in paper_entry.get("author", [])]
 
-    # esnure publication date
+    # ensure publication date
     published = paper_entry.get("published")
     if not published:
         return None
 
     date_parts = paper_entry.get("published").get("date-parts")
-    paper_date = DateConverter(date_parts[0]).date
+    paper_publication_date = DateConverter(date_parts[0]).convert_date()
     paper_urls = set()
     paper_urls.add(paper_entry.get("URL"))
     paper_doi = paper_entry.get("DOI")
@@ -130,13 +130,13 @@ def _get_paper(paper_entry: dict, publication: Publication) -> Paper:
 
     # note: check if ok i think these are counts
     return Paper(
-        paper_title,
-        paper_abstract,
-        paper_authors,
-        publication,
-        paper_date,
-        paper_urls,
-        paper_doi,
+        title=paper_title,
+        abstract=paper_abstract,
+        authors=paper_authors,
+        publication=publication,
+        publication_date=paper_publication_date,
+        urls=paper_urls,
+        doi=paper_doi,
         pages=paper_pages,
         references=paper_references,
     )

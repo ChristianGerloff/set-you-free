@@ -18,8 +18,8 @@ class Publication(BaseModel):
     issn: Optional[str] = Field(
         None,
         examples="12345678",
-        max_length=8,
-        min_length=8,
+        # max_length=8,
+        # min_length=8,
         description="ISSN of the publication.",
     )
     publisher: Optional[str] = Field(
@@ -74,11 +74,11 @@ class Publication(BaseModel):
         return value
 
     # TODO: is this useful?
-    @validator("issn")
-    def check_issn(cls, value: str) -> str:
-        if value and len(value) != 8:
-            raise (ValueError("Publication's ISSN is not 8 characters long."))
-        return value
+    # @validator("issn")
+    # def check_issn(cls, value: str) -> str:
+    #     if value and len(value) != 8:
+    #         raise (ValueError("Publication's ISSN is not 8 characters long."))
+    #     return value
 
     @validator("category")
     def check_category(cls, value: str) -> Union[str, None]:
