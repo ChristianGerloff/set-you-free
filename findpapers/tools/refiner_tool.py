@@ -20,7 +20,7 @@ def _print_paper_details(
     pass
 
 
-def _get_select_question_input():  # pragma: no cover
+def _get_select_question_input() -> None:  # pragma: no cover
     pass
 
 

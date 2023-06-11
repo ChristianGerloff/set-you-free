@@ -1,7 +1,7 @@
 import datetime
 import logging
 from dataclasses import asdict, dataclass
-from typing import List
+from typing import List, Literal
 
 import pandas as pd
 import rispy
@@ -9,7 +9,7 @@ import rispy
 from findpapers.models.search import Search
 
 
-def _split_page_information(pages: str = None):
+def _split_page_information(pages: str = None) -> tuple[Literal[""], Literal[""]] | list[str] | tuple[str, Literal[""]]:
     """Split page information into start and end page.
 
     Args:
@@ -18,7 +18,7 @@ def _split_page_information(pages: str = None):
     Returns:
         str: start_page, end_page
     """
-    if pages is None:
+    if not pages:
         return "", ""
     if "-" in pages:
         return pages.split("-")
