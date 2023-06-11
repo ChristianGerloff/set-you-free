@@ -177,7 +177,7 @@ def _get_paper(paper_page: html.HtmlElement, paper_doi: str, paper_url: str) -> 
     else:
         publication = None
 
-    paper_authors = [f"{x.get('family')}, {x.get('given')}" for x in paper_metadata.get("author", [])]
+    paper_authors = [f"{a.get('family')}, {a.get('given')}" for a in paper_metadata.get("author", [])]
 
     if issued := paper_metadata.get("issued"):
         date_parts = issued["date-parts"][0]
