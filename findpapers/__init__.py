@@ -9,9 +9,9 @@ from findpapers.tools.refiner_tool import refine
 from findpapers.tools.refman_tool import RisExport
 from findpapers.tools.search_runner_tool import search
 
-try:
-    import importlib.metadata as importlib_metadata
-except ModuleNotFoundError:
-    import importlib_metadata
+# try:
+#     import importlib.metadata as importlib_metadata
+# except ModuleNotFoundError:
+#     import importlib_metadata
 
-__version__ = importlib_metadata.version(__name__)
+# __version__ = importlib_metadata.version(__name__)
