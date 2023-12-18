@@ -1,35 +1,37 @@
 from decimal import Decimal
 from typing import Optional, Union
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
+
+from set_you_free.backend.findpapers.exceptions import IncorrectISSNLengthError, PublicationTitleMissingError
 
 
 class Publication(BaseModel):
     title: str = Field(
         ...,
-        examples="Fake title",
+        examples=["Fake title"],
         description="Title of the publication.",
     )
     isbn: Optional[str] = Field(
         None,
-        examples="1234567890",
+        examples=["1234567890"],
         description="ISBN of the publication.",
     )
     issn: Optional[str] = Field(
         None,
-        examples="12345678",
+        examples=["12345678"],
         # max_length=8,
         # min_length=8,
         description="ISSN of the publication.",
     )
     publisher: Optional[str] = Field(
         None,
-        examples="Fake publisher",
+        examples=["Fake publisher"],
         description="Publisher of the publication.",
     )
     category: Optional[str] = Field(
         None,
-        examples="journal",
+        examples=["journal"],
         description="Category of the publication.",
     )
     cite_score: Optional[Decimal] = Field(
@@ -60,26 +62,29 @@ class Publication(BaseModel):
     )
     is_potentially_predatory: Optional[bool] = Field(
         None,
-        examples=True,
+        examples=[True],
         description="Whether the publication is potentially predatory.",
     )
 
     def __hash__(self) -> int:
         return self.title.__hash__()
 
-    @validator("title")
+    @field_validator("title")
+    @classmethod
     def check_title(cls, value: str) -> str:
         if not value:
-            raise (ValueError("Publication's title is missing."))
+            raise PublicationTitleMissingError
         return value
 
-    @validator("issn")
+    @field_validator("issn")
+    @classmethod
     def check_issn(cls, value: str) -> str:
         if value and len(value) != 8:
-            raise (ValueError("Publication's ISSN must be only 8 characters long."))
+            raise IncorrectISSNLengthError
         return value
 
-    @validator("category")
+    @field_validator("category")
+    @classmethod
     def check_category(cls, value: str) -> Union[str, None]:
         if value is not None:
             if "journal" in value.lower():
@@ -96,11 +101,12 @@ class Publication(BaseModel):
                 value = None
         return value
 
-    @validator("subject_areas")
+    @field_validator("subject_areas")
+    @classmethod
     def set_subject_areas(cls, value: Union[set[str], None]) -> set[str]:
         return value if value is not None else set()
 
-    def enrich(self, publication: "Publication") -> "Publication":
+    def enrich(self, publication: "Publication") -> None:
         self.title = publication.title if self.title is None or len(self.title) < len(publication.title) else self.title
         self.isbn = publication.isbn if self.isbn is None else self.isbn
         self.issn = publication.issn if self.issn is None else self.issn

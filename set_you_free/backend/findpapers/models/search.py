@@ -1,11 +1,16 @@
 import itertools
 from datetime import date, datetime
 from difflib import SequenceMatcher
-from typing import Optional
+from typing import Any, Optional
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 
 from set_you_free.backend.findpapers.data.available_databases import AVAILABLE_DATABASES
+from set_you_free.backend.findpapers.exceptions import (
+    DatabaseNotSelectedError,
+    MissingSearchQueryError,
+    UnsupportedDatabaseError,
+)
 from set_you_free.backend.findpapers.models.paper import Paper
 from set_you_free.backend.findpapers.models.publication import Publication
 
@@ -69,32 +74,33 @@ class Search(BaseModel):
     def __hash__(self) -> int:
         return self.query.__hash__()
 
-    @validator("query", pre=True)
+    @field_validator("query", mode="before")
+    @classmethod
     def check_query(cls, value: str) -> str:
         if not value:
-            raise (ValueError("Search query is missing."))
+            raise MissingSearchQueryError
         return value
 
-    @validator("since", "until")
+    @field_validator("since", "until")
+    @classmethod
     def validate_date(cls, value):
-        if value and isinstance(value, datetime):
-            value = value.date()
-        return value
+        return value.date() if value and isinstance(value, datetime) else value
 
-    @validator("processed_at")
-    def assign_processed_at(cls, value):
-        if not value:
-            return datetime.utcnow()
-        return value
+    @field_validator("processed_at")
+    @classmethod
+    def assign_processed_at(cls, value) -> datetime | Any:
+        return value if value else datetime.utcnow()
 
-    @validator("collected_papers")
-    def validate_collected_papers(cls, value):
+    @field_validator("collected_papers")
+    @classmethod
+    def validate_collected_papers(cls, value) -> set | None:
         if value:
             for paper in value:
                 try:
                     cls.add_paper(paper)
                 except Exception:
                     pass
+            return None
         else:
             return set()
 
@@ -103,7 +109,7 @@ class Search(BaseModel):
 
     def add_database(self, database_name: str) -> None:
         if database_name not in AVAILABLE_DATABASES:
-            raise ValueError(f"Database {database_name} is not supported.")
+            raise UnsupportedDatabaseError(database_name)
         self.databases.add(database_name)
 
     def get_paper_key(
@@ -133,9 +139,7 @@ class Search(BaseModel):
 
     def add_paper(self, paper: Paper) -> None:
         if not paper.databases:
-            raise ValueError(
-                "Paper cannot be added to search without at least one defined database.",
-            )
+            raise DatabaseNotSelectedError
 
         databases_lowered = {db.lower() for db in self.databases}
 

@@ -2,6 +2,12 @@ from datetime import date
 
 import pytest
 
+from set_you_free.backend.findpapers.exceptions import (
+    InvalidSourceError,
+    PaperPublicationDateMissingError,
+    PaperTitleMissingError,
+    UnsupportedDatabaseError,
+)
 from set_you_free.backend.findpapers.models.paper import Paper
 from set_you_free.backend.tests.integration.factories.publication_factory import (
     Publication,
@@ -16,29 +22,29 @@ class TestPaper:
 
     def test_paper_title_is_none(self, paper: Paper) -> None:
         paper.title = None
-        with pytest.raises(ValueError) as exc_info:
+        with pytest.raises(PaperTitleMissingError) as exc_info:
             paper.check_title(paper.title)
         assert str(exc_info.value) == "Paper's title is missing."
 
     def test_publication_date_is_none(self, paper: Paper) -> None:
         paper.publication_date = None
-        with pytest.raises(ValueError) as exc_info:
+        with pytest.raises(PaperPublicationDateMissingError) as exc_info:
             paper.check_publication_date(paper.publication_date)
         assert str(exc_info.value) == "Paper's publication_date is missing."
 
     def test_incorrect_source(self, paper: Paper) -> None:
         paper.source = "qwerty"
         sources = ["primary", "references", "cites"]
-        with pytest.raises(ValueError) as exc_info:
+        with pytest.raises(InvalidSourceError) as exc_info:
             paper.check_source(paper.source)
         assert str(exc_info.value) == f"Source of the paper is invalid. Valid sources are {sources}."
 
     def test_to_dict_data_type(self, paper: Paper) -> None:
-        assert isinstance(paper.dict(), dict)
+        assert isinstance(paper.model_dump(), dict)
 
     def test_incorrect_database(self, paper: Paper) -> None:
         database_name = "test"
-        with pytest.raises(ValueError) as exc_info:
+        with pytest.raises(UnsupportedDatabaseError) as exc_info:
             paper.add_database(database_name=database_name)
         assert str(exc_info.value) == f"Database {database_name} is not supported."
 

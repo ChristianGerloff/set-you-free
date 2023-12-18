@@ -2,17 +2,23 @@ import re
 from datetime import date
 from typing import Optional, Union
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 
 from set_you_free.backend.findpapers.data.available_databases import AVAILABLE_DATABASES
+from set_you_free.backend.findpapers.exceptions import (
+    InvalidSourceError,
+    PaperPublicationDateMissingError,
+    PaperTitleMissingError,
+    UnsupportedDatabaseError,
+)
 from set_you_free.backend.findpapers.models.publication import Publication
 
 
 class Paper(BaseModel):
-    title: str = Field(..., examples="Fake title", description="Title of the paper.")
+    title: str = Field(..., examples=["Fake title"], description="Title of the paper.")
     abstract: str = Field(
         ...,
-        examples="Fake abstract",
+        examples=["Fake abstract"],
         description="Abstract of the paper.",
     )
     authors: list[str] = Field(
@@ -23,7 +29,7 @@ class Paper(BaseModel):
     publication: Publication
     publication_date: date = Field(
         ...,
-        examples="2020-01-01",
+        examples=["2020-01-01"],
         description="Publication date of the paper.",
     )
     urls: set[str] = Field(
@@ -33,7 +39,7 @@ class Paper(BaseModel):
     )
     doi: Optional[str] = Field(
         None,
-        examples="10.1016/j.jneumeth.2020.01.001",
+        examples=["10.1016/j.jneumeth.2020.01.001"],
         description="DOI of the paper.",
     )
     citations: Optional[int] = Field(
@@ -104,35 +110,36 @@ class Paper(BaseModel):
     def __hash__(self) -> int:
         return self.title.__hash__()
 
-    @validator("title")
+    @field_validator("title")
+    @classmethod
     def check_title(cls, value: str) -> str:
         if not value:
-            raise (ValueError("Paper's title is missing."))
+            raise PaperTitleMissingError
         return value
 
-    @validator("publication_date")
+    @field_validator("publication_date")
+    @classmethod
     def check_publication_date(cls, value: date) -> date:
         if not value:
-            raise (ValueError("Paper's publication_date is missing."))
+            raise PaperPublicationDateMissingError
         return value
 
-    @validator("keywords")
+    @field_validator("keywords")
+    @classmethod
     def check_keywords(cls, value: Union[set[str], None]) -> set[str]:
         return value if value is not None else set()
 
-    @validator("databases")
+    @field_validator("databases")
+    @classmethod
     def check_databases(cls, value: Union[set[str], None]) -> set[str]:
         return value if value is not None else set()
 
-    @validator("source")
+    @field_validator("source")
+    @classmethod
     def check_source(cls, value: str) -> str:
         sources = ["primary", "references", "cites"]
         if value not in sources:
-            raise (
-                ValueError(
-                    f"Source of the paper is invalid. Valid sources are {sources}.",
-                )
-            )
+            raise InvalidSourceError(sources)
         return value
 
     def review(self, selected: bool, criteria: list = []) -> None:
@@ -142,13 +149,13 @@ class Paper(BaseModel):
 
     def add_database(self, database_name: str) -> None:
         if database_name not in AVAILABLE_DATABASES:
-            raise ValueError(f"Database {database_name} is not supported.")
+            raise UnsupportedDatabaseError(database_name)
         self.databases.add(database_name)
 
-    def add_url(self, url: str) -> set[str]:
+    def add_url(self, url: str) -> None:
         self.urls.add(url)
 
-    def enrich(self, paper: "Paper") -> "Paper":
+    def enrich(self, paper: "Paper") -> None:
         self.publication_date = paper.publication_date if self.publication_date is None else self.publication_date
         self.doi = paper.doi if self.doi is None else self.doi
         self.abstract = (

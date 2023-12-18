@@ -2,6 +2,7 @@ from decimal import Decimal
 
 import pytest
 
+from set_you_free.backend.findpapers.exceptions import IncorrectISSNLengthError, PublicationTitleMissingError
 from set_you_free.backend.findpapers.models.publication import Publication
 from set_you_free.backend.tests.integration.utils.publication_utils import create_publication_event
 
@@ -12,7 +13,7 @@ class TestPublication:
 
     def test_publication_isbn_is_none(self, publication: Publication) -> None:
         publication.title = None
-        with pytest.raises(ValueError) as exc_info:
+        with pytest.raises(PublicationTitleMissingError) as exc_info:
             Publication.check_title(publication.title)
         assert str(exc_info.value) == "Publication's title is missing."
 
@@ -21,7 +22,7 @@ class TestPublication:
 
     def test_error_is_raised_when_issn_does_not_have_length_eight(self, publication: Publication) -> None:
         publication.issn = "1234567890"
-        with pytest.raises(ValueError) as exc_info:
+        with pytest.raises(IncorrectISSNLengthError) as exc_info:
             Publication.check_issn(publication.issn)
         assert str(exc_info.value) == "Publication's ISSN must be only 8 characters long."
 
@@ -35,7 +36,7 @@ class TestPublication:
         ]
 
     def test_to_dict_data_type(self, publication: Publication) -> None:
-        assert isinstance(publication.dict(), dict)
+        assert isinstance(publication.model_dump(), dict)
 
     def test_from_dict_data_type(
         self,

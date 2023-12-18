@@ -3,6 +3,11 @@ from datetime import date, datetime
 
 import pytest
 
+from set_you_free.backend.findpapers.exceptions import (
+    DatabaseNotSelectedError,
+    MissingSearchQueryError,
+    UnsupportedDatabaseError,
+)
 from set_you_free.backend.findpapers.models.paper import Paper
 from set_you_free.backend.findpapers.models.search import Search
 from set_you_free.backend.tests.integration.utils.paper_utils import create_paper_event
@@ -14,7 +19,7 @@ class TestSearch:
 
     def test_that_search_query_is_none(self, search: Search) -> None:
         search.query = None
-        with pytest.raises(ValueError) as exc_info:
+        with pytest.raises(MissingSearchQueryError) as exc_info:
             search.check_query(search.query)
         assert str(exc_info.value) == "Search query is missing."
 
@@ -26,11 +31,11 @@ class TestSearch:
         assert search.query == new_query
 
     def test_to_dict_data_type(self, search: Search) -> None:
-        assert isinstance(search.dict(), dict)
+        assert isinstance(search.model_dump(), dict)
 
     def test_incorrect_database(self, search: Search) -> None:
         database_name = "test"
-        with pytest.raises(ValueError) as exc_info:
+        with pytest.raises(UnsupportedDatabaseError) as exc_info:
             search.add_database(database_name=database_name)
         assert str(exc_info.value) == f"Database {database_name} is not supported."
 
@@ -167,7 +172,7 @@ class TestSearch:
         another_paper_2.abstract = "a long abstract"
         another_paper_2.databases = set()
 
-        with pytest.raises(ValueError) as exc_info:
+        with pytest.raises(DatabaseNotSelectedError) as exc_info:
             search.add_paper(another_paper_2)
         assert str(exc_info.value) == ("Paper cannot be added to search without at least one defined database.")
 
