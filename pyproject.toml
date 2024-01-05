@@ -13,10 +13,14 @@ matplotlib-venn = "^0.11.7"
 streamlit-aggrid = "^0.3.0"
 rispy = "^0.7.1"
 stqdm = "^0.0.4"
+wordcloud = "^1.9.1.1"
+selenium = "^4.9.1"
+streamlit-tags = "^1.2.8"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.0.260"
 ptvsd = "^4.3.2"
+ipykernel = "^6.23.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
